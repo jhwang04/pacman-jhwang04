@@ -19,7 +19,7 @@ public class Tile {
 	public void draw(PacmanApplet p) {
 		p.pushStyle();
 		p.pushMatrix();
-		p.translate(column * 20, row * 20);
+		p.translate(column * 20, row * 20 + 50);
 		
 		Tile[][] tiles = p.getTiles();
 		Tile above, below, left, right;
@@ -71,7 +71,7 @@ public class Tile {
 		case 3:
 			p.noStroke();
 			p.fill(255);
-			p.ellipse(10, 10, 10, 10);
+			p.ellipse(10, 10, 14, 14);
 			break;
 		}
 		

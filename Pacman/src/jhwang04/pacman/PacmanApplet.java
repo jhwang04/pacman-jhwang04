@@ -1,6 +1,5 @@
 package jhwang04.pacman;
 
-import java.util.ArrayList;
 
 import processing.core.PApplet;
 
@@ -8,6 +7,7 @@ public class PacmanApplet extends PApplet {
 	private int level;
 	private int screen;
 	private Tile[][] tiles = new Tile[31][28];
+	private Player player;
 	
 	public static final int TITLE_SCREEN = 0;
 	public static final int GAME_SCREEN = 1;
@@ -45,11 +45,19 @@ public class PacmanApplet extends PApplet {
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 	};
 	
+	/*
+	 * Notes for later:
+	 * red ghost rgb = 255, 0, 0
+	 * pink ghost rgb = 255, 184, 255
+	 * blue ghost rgb = 0, 255, 255
+	 * orange ghost rgb = 255, 184, 82
+	 */
 	
 	//initializes all values
 	public PacmanApplet() {
 		level = 0;
 		screen = TITLE_SCREEN;
+		player = new Player(280, 520);
 		
 		//initializes the tiles
 		for(int i = 0; i < 31; i++ ) {
@@ -61,26 +69,65 @@ public class PacmanApplet extends PApplet {
 	
 	//sets the width and height to 800
 	public void settings() {
-		size(800, 800);
+		size(560, 800);
 	}
 	
 	public void draw() {
 		pushMatrix();
-		scale((float) (width/800.0), (float) (height/800.0));
+		scale((float) (width/560.0), (float) (height/800.0));
 		background(0);
 		
 		drawTiles();
+		player.draw(this);
 		
 		popMatrix();
 	}
+	
+	public void keyPressed() {
+		if(keyCode == UP || keyCode == DOWN || keyCode == LEFT || keyCode == RIGHT) {
+			player.setRight(false);
+			player.setLeft(false);
+			player.setUp(false);
+			player.setDown(false);
+		}
+		
+		switch(keyCode) {
+		case UP:
+			player.setUp(true);
+			break;
+		case DOWN:
+			player.setDown(true);
+			break;
+		case LEFT:
+			player.setLeft(true);
+			break;
+		case RIGHT:
+			player.setRight(true);
+		}
+	}
+	
+	/*public void keyReleased() {
+		switch(keyCode) {
+		case UP:
+			player.setUp(false);
+			break;
+		case DOWN:
+			player.setDown(false);
+			break;
+		case LEFT:
+			player.setLeft(false);
+			break;
+		case RIGHT:
+			player.setRight(false);
+		}
+	}*/
 	
 	//helper method to draw the tiles
 	private void drawTiles() {
 		for(int i = 0; i < tiles.length; i++) {
 			Tile[] column = tiles[i];
-			for(int j = 0; j < column.length; j++) {
+			for(int j = 0; j < column.length; j++)
 				column[j].draw(this);
-			}
 		}
 	}
 	
