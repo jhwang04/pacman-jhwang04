@@ -1,6 +1,7 @@
 package jhwang04.pacman;
 
 
+import jhwang04.pacman.entity.Player;
 import processing.core.PApplet;
 
 public class PacmanApplet extends PApplet {
