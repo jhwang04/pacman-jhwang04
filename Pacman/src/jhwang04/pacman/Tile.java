@@ -52,6 +52,8 @@ public class Tile {
 			p.noFill();
 			p.strokeWeight(3);
 			p.stroke(0, 0, 200);
+			if((column == 13 || column == 14) && row == 12)
+				p.stroke(150, 150, 150);
 			
 			if(above.getType() == WALL)
 				p.line(10, 0, 10, 10);
@@ -87,5 +89,9 @@ public class Tile {
 	
 	public int getType() {
 		return type;
+	}
+	
+	public void setType(int type) {
+		this.type = type;
 	}
 }

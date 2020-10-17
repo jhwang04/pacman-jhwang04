@@ -77,50 +77,35 @@ public class PacmanApplet extends PApplet {
 		scale((float) (width/560.0), (float) (height/800.0));
 		background(0);
 		
+		if(keyPressed) {
+			if(keyCode == UP) {
+				if(player.getUp() == false)
+					player.setDown(false);
+				player.setUp(true);
+			}
+			if(keyCode == DOWN) {
+				if(player.getDown() == false)
+					player.setUp(false);
+				player.setDown(true);
+			}
+			if(keyCode == RIGHT) {
+				if(player.getRight() == false)
+					player.setLeft(false);
+				player.setRight(true);
+			}
+			if(keyCode == LEFT) {
+				if(player.getLeft() == false)
+					player.setRight(false);
+				player.setLeft(true);
+			}
+		}
+		
 		drawTiles();
+		player.move(this);
 		player.draw(this);
 		
 		popMatrix();
 	}
-	
-	public void keyPressed() {
-		if(keyCode == UP || keyCode == DOWN || keyCode == LEFT || keyCode == RIGHT) {
-			player.setRight(false);
-			player.setLeft(false);
-			player.setUp(false);
-			player.setDown(false);
-		}
-		
-		switch(keyCode) {
-		case UP:
-			player.setUp(true);
-			break;
-		case DOWN:
-			player.setDown(true);
-			break;
-		case LEFT:
-			player.setLeft(true);
-			break;
-		case RIGHT:
-			player.setRight(true);
-		}
-	}
-	
-	/*public void keyReleased() {
-		switch(keyCode) {
-		case UP:
-			player.setUp(false);
-			break;
-		case DOWN:
-			player.setDown(false);
-			break;
-		case LEFT:
-			player.setLeft(false);
-			break;
-		case RIGHT:
-			player.setRight(false);
-		}
-	}*/
 	
 	//helper method to draw the tiles
 	private void drawTiles() {
@@ -133,6 +118,18 @@ public class PacmanApplet extends PApplet {
 	
 	public Tile[][] getTiles() {
 		return tiles;
+	}
+	
+	//returns a blank tile at that location if it is out of range
+	public Tile getTile(int row, int column) {
+		Tile t;
+		try {
+			t = tiles[row][column];
+		} catch(ArrayIndexOutOfBoundsException e) {
+			t = new Tile(row, column, 0);
+		}
+		
+		return t;
 	}
 }
 
