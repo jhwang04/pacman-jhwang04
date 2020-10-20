@@ -1,5 +1,10 @@
 package jhwang04.pacman.entity;
 
+import java.awt.event.KeyEvent;
+
+import jhwang04.pacman.PacmanApplet;
+import jhwang04.pacman.Tile;
+
 public class Entity {
 	private double x, y, speed;
 	private boolean up, down, left, right; //movement variables
@@ -8,6 +13,18 @@ public class Entity {
 		this.x = x;
 		this.y = y;
 		this.speed = speed;
+		up = false;
+		down = false;
+		left = false;
+		right = false;
+	}
+	
+	public void draw(PacmanApplet p) {	
+		//different for each entity
+	}
+	
+	public void move(PacmanApplet p) {
+		//different for every entity
 	}
 	
 	public double getX() {

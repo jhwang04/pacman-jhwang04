@@ -2,6 +2,7 @@ package jhwang04.pacman;
 
 
 import jhwang04.pacman.entity.Player;
+import jhwang04.pacman.entity.ghost.Ghost;
 import processing.core.PApplet;
 
 public class PacmanApplet extends PApplet {
@@ -9,6 +10,7 @@ public class PacmanApplet extends PApplet {
 	private int screen;
 	private Tile[][] tiles = new Tile[31][28];
 	private Player player;
+	private Ghost ghost;
 	
 	public static final int TITLE_SCREEN = 0;
 	public static final int GAME_SCREEN = 1;
@@ -59,6 +61,7 @@ public class PacmanApplet extends PApplet {
 		level = 0;
 		screen = TITLE_SCREEN;
 		player = new Player(280, 520);
+		ghost = new Ghost(30, 80);
 		
 		//initializes the tiles
 		for(int i = 0; i < 31; i++ ) {
@@ -102,10 +105,21 @@ public class PacmanApplet extends PApplet {
 		}
 		
 		drawTiles();
-		player.move(this);
-		player.draw(this);
+		
+		if(getTile(player.getTileY(), player.getTileX()) != getTile(ghost.getTileY(), ghost.getTileX())) {
+			//player.move(this);
+			player.draw(this);
+			
+			//ghost.move(this);
+			ghost.draw(this);
+		}
 		
 		popMatrix();
+	}
+	
+	public void mouseReleased() {
+		player.move(this);
+		ghost.move(this);
 	}
 	
 	//helper method to draw the tiles
@@ -119,6 +133,10 @@ public class PacmanApplet extends PApplet {
 	
 	public Tile[][] getTiles() {
 		return tiles;
+	}
+	
+	public Player getPlayer() {
+		return player;
 	}
 	
 	//returns a blank tile at that location if it is out of range

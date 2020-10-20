@@ -48,7 +48,6 @@ public class Tile {
 		
 		switch(type) {
 		case 1:
-			p.noStroke();
 			p.noFill();
 			p.strokeWeight(3);
 			p.stroke(0, 0, 200);
@@ -93,5 +92,13 @@ public class Tile {
 	
 	public void setType(int type) {
 		this.type = type;
+	}
+	
+	public int getRow() {
+		return row;
+	}
+	
+	public int getColumn() {
+		return column;
 	}
 }
