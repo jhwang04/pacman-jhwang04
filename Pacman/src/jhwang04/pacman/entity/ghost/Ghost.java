@@ -13,7 +13,7 @@ public class Ghost extends Entity {
 	private Tile lastTile;
 	
 	public Ghost(double x, double y) {
-		super(x, y, 200.0);
+		super(x, y, 190.0);
 		this.targetTile = new Tile(-1, -1, 0);
 		this.lastTile = new Tile(-1, -2, 0);
 	}
