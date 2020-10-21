@@ -101,4 +101,10 @@ public class Tile {
 	public int getColumn() {
 		return column;
 	}
+	
+	public double distanceTo(Tile other) {
+		int changeX = getColumn() - other.getColumn();
+		int changeY = getRow() - other.getRow();
+		return Math.sqrt(changeX * changeX + changeY * changeY);
+	}
 }

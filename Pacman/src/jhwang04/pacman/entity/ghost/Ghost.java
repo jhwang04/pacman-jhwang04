@@ -1,5 +1,8 @@
 package jhwang04.pacman.entity.ghost;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jhwang04.pacman.PacmanApplet;
 import jhwang04.pacman.Tile;
 import jhwang04.pacman.entity.Entity;
@@ -12,7 +15,7 @@ public class Ghost extends Entity {
 	public Ghost(double x, double y) {
 		super(x, y, 200.0);
 		this.targetTile = new Tile(-1, -1, 0);
-		this.lastTile = new Tile(-1, -1, 0);
+		this.lastTile = new Tile(-1, -2, 0);
 	}
 	
 	public void draw(PacmanApplet p) {
@@ -69,37 +72,45 @@ public class Ghost extends Entity {
 		
 		
 		
-		int openPaths = 0;
-		if(above.getType() != Tile.WALL)
-			openPaths++;
-		if(below.getType() != Tile.WALL)
-			openPaths++;
-		if(left.getType() != Tile.WALL)
-			openPaths++;
-		if(right.getType() != Tile.WALL)
-			openPaths++;
+		List<Tile> possibilities = new ArrayList<Tile>();
+		if(above.getType() != Tile.WALL && !tilesAreEqual(above, lastTile))
+			possibilities.add(above);
+		if(below.getType() != Tile.WALL && !tilesAreEqual(below, lastTile))
+			possibilities.add(below);
+		if(left.getType() != Tile.WALL && !tilesAreEqual(left, lastTile))
+			possibilities.add(left);
+		if(right.getType() != Tile.WALL && !tilesAreEqual(right, lastTile))
+			possibilities.add(right);
 		
 		//System.out.println(above.equals(p.getTile(lastTile.getRow(), lastTile.getColumn())));
-		System.out.println(getTileY() + ", " + getTileX() + " ; lastTile = " + lastTile.getRow() + ", " + lastTile.getColumn());
+		//System.out.println(getTileY() + ", " + getTileX() + " ; lastTile = " + lastTile.getRow() + ", " + lastTile.getColumn());
+		//System.out.println(possibilities.size());
 		
-		if(openPaths == 2) { //when pacman is going down a straight path, he goes to the tile he did not come from
-			if(above.getType() != Tile.WALL && above.getRow() != lastTile.getRow() && above.getColumn() != lastTile.getColumn())
+		if(possibilities.size() == 1) { //when pacman is going down a straight path, he goes to the tile he did not come from
+			if(tilesAreEqual(possibilities.get(0), above))
 				setDirection("up");
-			if(below.getType() != Tile.WALL && below.getRow() != lastTile.getRow() && below.getColumn() != lastTile.getColumn())
+			if(tilesAreEqual(possibilities.get(0), below))
 				setDirection("down");
-			if(right.getType() != Tile.WALL && right.getRow() != lastTile.getRow() && right.getColumn() != lastTile.getColumn())
+			if(tilesAreEqual(possibilities.get(0), right))
 				setDirection("right");
-			if(left.getType() != Tile.WALL && left.getRow() != lastTile.getRow() && left.getColumn() != lastTile.getColumn())
+			if(tilesAreEqual(possibilities.get(0), left))
 				setDirection("left");
 		}
-		if(openPaths >= 3) { //when pacman reaches a true decision point
-			if(tx > getTileX() && p.getTile(getTileY(), getTileX() + 1).getType() != Tile.WALL )
+		
+		if(possibilities.size() >= 2) { //when pacman reaches a true decision point
+			Tile choice = new Tile(100, 100, 0);
+			for(Tile tile : possibilities) {
+				if(tile.distanceTo(targetTile) <= choice.distanceTo(targetTile))
+					choice = tile;
+			}
+			
+			if(tilesAreEqual(right, choice))
 				setDirection("right");
-			else if(tx < getTileX() && p.getTile(getTileY(), getTileX() - 1).getType() != Tile.WALL )
+			else if(tilesAreEqual(left, choice))
 				setDirection("left");
-			else if(ty > getTileY() && p.getTile(getTileY() + 1, getTileX()).getType() != Tile.WALL )
+			else if(tilesAreEqual(below, choice))
 				setDirection("down");
-			else if(ty < getTileX() && p.getTile(getTileY() - 1, getTileX()).getType() != Tile.WALL )
+			else if(tilesAreEqual(above, choice))
 				setDirection("up");
 		}
 		
@@ -129,5 +140,9 @@ public class Ghost extends Entity {
 			break;
 		
 		}
+	}
+	
+	private boolean tilesAreEqual(Tile t1, Tile t2) {
+		return (t1.getRow() == t2.getRow() && t1.getColumn() == t2.getColumn());
 	}
 }

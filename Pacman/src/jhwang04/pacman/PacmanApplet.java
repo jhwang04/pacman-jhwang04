@@ -107,20 +107,20 @@ public class PacmanApplet extends PApplet {
 		drawTiles();
 		
 		if(getTile(player.getTileY(), player.getTileX()) != getTile(ghost.getTileY(), ghost.getTileX())) {
-			//player.move(this);
+			player.move(this);
 			player.draw(this);
 			
-			//ghost.move(this);
+			ghost.move(this);
 			ghost.draw(this);
 		}
 		
 		popMatrix();
 	}
 	
-	public void mouseReleased() {
+	/*public void mouseReleased() {
 		player.move(this);
 		ghost.move(this);
-	}
+	}*/
 	
 	//helper method to draw the tiles
 	private void drawTiles() {
