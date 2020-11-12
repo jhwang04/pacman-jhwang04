@@ -88,7 +88,7 @@ public class PacmanApplet extends PApplet {
 			List<Node> neighbors = getNeighboringNodes(node.getTile());
 			for(Node neighbor : neighbors)
 				Node.connectNodes(node, neighbor);
-			System.out.println("Node done! row = " + node.getTile().getRow() + ", column = " + node.getTile().getColumn());
+			//System.out.println("Node done! row = " + node.getTile().getRow() + ", column = " + node.getTile().getColumn());
 		}
 	}
 	
@@ -219,13 +219,13 @@ public class PacmanApplet extends PApplet {
 		
 		Tile tile = getTile(row, column);
 		if(tile.getType() == Tile.WALL) {
-			System.out.println("escaped by hitting wall");
+			//System.out.println("escaped by hitting wall");
 			return null;
 		} else if(!isTileInRange(tile)) {
-			System.out.println("escaped by going out of bounds");
+			//System.out.println("escaped by going out of bounds");
 			return null;
 		} else if(isNode(tile.getRow(), tile.getColumn())) {
-			System.out.println("escaped by finding node");
+			//System.out.println("escaped by finding node");
 			return getNodeAt(tile);
 		} else
 			return getNodeInDirection(direction, row, column);
