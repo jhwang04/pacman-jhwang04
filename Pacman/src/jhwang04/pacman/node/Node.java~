@@ -1,0 +1,13 @@
+package jhwang04.pacman.node;
+
+/**
+ * Represents a Pacman pathfinding node
+ * @author jhwang04
+ */
+public class Node {
+	/**
+	 * The tile x-coordinate of the node
+	 */
+	public int tileX;
+	public int tileY;
+}
