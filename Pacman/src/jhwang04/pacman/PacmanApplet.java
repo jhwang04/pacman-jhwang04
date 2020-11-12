@@ -1,8 +1,12 @@
 package jhwang04.pacman;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jhwang04.pacman.entity.Player;
 import jhwang04.pacman.entity.ghost.Ghost;
+import jhwang04.pacman.node.Node;
 import processing.core.PApplet;
 
 public class PacmanApplet extends PApplet {
@@ -11,6 +15,7 @@ public class PacmanApplet extends PApplet {
 	private Tile[][] tiles = new Tile[31][28];
 	private Player player;
 	private Ghost ghost;
+	private List<Node> nodes;
 	
 	public static final int TITLE_SCREEN = 0;
 	public static final int GAME_SCREEN = 1;
@@ -62,12 +67,28 @@ public class PacmanApplet extends PApplet {
 		screen = TITLE_SCREEN;
 		player = new Player(280, 520);
 		ghost = new Ghost(30, 80);
+		nodes = new ArrayList<Node>();
 		
 		//initializes the tiles
 		for(int i = 0; i < 31; i++ ) {
 			for(int j = 0; j < 28; j++) {
 				tiles[i][j] = new Tile(i, j, BOARD_TEMPLATE[i][j]);
 			}
+		}
+		
+		//initializes the nodes
+		for(int i = 0; i < 31; i++) {
+			for(int j = 0; j < 28; j++) {
+				if(isNode(i,j))
+					nodes.add(new Node(tiles[i][j]));
+			}
+		}
+		//connects the nodes
+		for(Node node : nodes) {
+			List<Node> neighbors = getNeighboringNodes(node.getTile());
+			for(Node neighbor : neighbors)
+				Node.connectNodes(node, neighbor);
+			System.out.println("Node done! row = " + node.getTile().getRow() + ", column = " + node.getTile().getColumn());
 		}
 	}
 	
@@ -106,6 +127,8 @@ public class PacmanApplet extends PApplet {
 		
 		drawTiles();
 		
+		drawNodes();
+		
 		if(getTile(player.getTileY(), player.getTileX()) != getTile(ghost.getTileY(), ghost.getTileX())) {
 			player.move(this);
 			player.draw(this);
@@ -131,6 +154,13 @@ public class PacmanApplet extends PApplet {
 		}
 	}
 	
+	//helper method to draw the nodes
+	private void drawNodes() {
+		for(Node node : nodes) {
+			node.draw(this);
+		}
+	}
+	
 	public Tile[][] getTiles() {
 		return tiles;
 	}
@@ -138,6 +168,8 @@ public class PacmanApplet extends PApplet {
 	public Player getPlayer() {
 		return player;
 	}
+	
+	
 	
 	//returns a blank tile at that location if it is out of range
 	public Tile getTile(int row, int column) {
@@ -149,6 +181,87 @@ public class PacmanApplet extends PApplet {
 		}
 		
 		return t;
+	}
+	
+	//returns all neighboring nodes
+	public List<Node> getNeighboringNodes(Tile t) {
+		List<Node> neighbors = new ArrayList<Node>();
+		
+		int column = t.getColumn();
+		int row = t.getRow();
+		
+		Node aboveNeighbor = getNodeInDirection("up", row, column);
+		Node belowNeighbor = getNodeInDirection("down", row, column);
+		Node rightNeighbor = getNodeInDirection("right", row, column);
+		Node leftNeighbor = getNodeInDirection("left", row, column);
+		
+		if(aboveNeighbor != null)
+			neighbors.add(aboveNeighbor);
+		if(belowNeighbor != null)
+			neighbors.add(belowNeighbor);
+		if(rightNeighbor != null)
+			neighbors.add(rightNeighbor);
+		if(leftNeighbor != null)
+			neighbors.add(leftNeighbor);
+		
+		return neighbors;
+	}
+	
+	private Node getNodeInDirection(String direction, int row, int column) {
+		if(direction.equals("right"))
+			column++;
+		else if(direction.equals("left"))
+			column--;
+		else if(direction.equals("down"))
+			row++;
+		else if(direction.equals("up"))
+			row--;
+		
+		Tile tile = getTile(row, column);
+		if(tile.getType() == Tile.WALL) {
+			System.out.println("escaped by hitting wall");
+			return null;
+		} else if(!isTileInRange(tile)) {
+			System.out.println("escaped by going out of bounds");
+			return null;
+		} else if(isNode(tile.getRow(), tile.getColumn())) {
+			System.out.println("escaped by finding node");
+			return getNodeAt(tile);
+		} else
+			return getNodeInDirection(direction, row, column);
+			
+			
+	}
+	
+	private boolean isNode(int row, int column) {
+		Tile tile = getTile(row, column);
+		Tile above = getTile(tile.getRow()-1, tile.getColumn());
+		Tile below = getTile(tile.getRow()+1, tile.getColumn());
+		Tile right = getTile(tile.getRow(), tile.getColumn()+1);
+		Tile left = getTile(tile.getRow(), tile.getColumn()-1);
+		
+		if(tile.getType() != Tile.WALL && (right.getType() != Tile.WALL || left.getType() != Tile.WALL) && (above.getType() != Tile.WALL || below.getType() != Tile.WALL)) {
+			//northeast, southeast, nortwest, southwest tiles
+			Tile ne = getTile(tile.getRow()-1, tile.getColumn()+1);
+			Tile nw = getTile(tile.getRow()-1, tile.getColumn()-1);
+			Tile se = getTile(tile.getRow()+1, tile.getColumn()+1);
+			Tile sw = getTile(tile.getRow()+1, tile.getColumn()-1);
+			if(ne.getType()==Tile.WALL && se.getType()==Tile.WALL && nw.getType()==Tile.WALL && sw.getType()==Tile.WALL)
+				return true;
+		}
+		return false;
+	}
+	
+	private Node getNodeAt(Tile t) {
+		for(Node node : nodes) {
+			if(node.getTile().getRow() == t.getRow() && node.getTile().getColumn() == t.getColumn())
+				return node;
+		}
+		return null;
+	}
+	
+	private boolean isTileInRange(Tile t) {
+		return(t.getColumn() > -1 && t.getColumn() < 29 && t.getRow() > -1 && t.getColumn() < 32);
 	}
 }
 

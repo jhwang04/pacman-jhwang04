@@ -1,59 +1,126 @@
 package jhwang04.pacman.node;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import jhwang04.pacman.Tile;
+import processing.core.PApplet;
 
 /**
- * Represents a Pacman pathfinding node
+ * Represents a Pacman pathfinding Node
  * @author jhwang04
  */
 public class Node {
-    /**
-     * The Tile that the Node is on
-     */
-    private Tile tile;
+	/**
+	 * The Tile that the Node is on
+	 */
+	private Tile tile;
 
-    /**
-     * The Nodes that this Node is connected to
-     */
-    private List<Node> connections;
+	/**
+	 * The Nodes that this Node is connected to
+	 */
+	private List<Node> connections;
 
-    /**
-     * Creates a new node at the location of the given Tile
-     * @param tile The Tile at the location of the new Node
-     */
-    public Node(Tile tile) {
-	this.tile = tile;
-    }
+	/**
+	 * Score that will be used by A* pathfinding, hopefully
+	 */
+	private int currentScore;
+	
+	/**
+	 * Creates a new node at the location of the given Tile
+	 * 
+	 * @param tile The Tile at the location of the new Node
+	 */
+	public Node(Tile tile) {
+		this.tile = tile;
+		currentScore = 10000;
+		connections = new ArrayList<Node>();
+	}
 
-    /**
-     * Returns the Tile that the Node is on top of
-     */
-    public Tile getTile() {
-	return tile;
-    }
+	/**
+	 * Returns the Tile that the Node is on top of
+	 */
+	public Tile getTile() {
+		return tile;
+	}
 
-    /**
-     * Connects the given nodes to each other
-     */
-    public static void connectNodes(Node node1, Node node2) {
-	if(!node1.getConnections().contains(node2)) {
-	    node1.addNode(node2);
-	    connectNodes(node2, node1);
+	/**
+	 * Connects the given Nodes to each other, if they aren't already
+	 */
+	public static void connectNodes(Node node1, Node node2) {
+		if(!node1.getConnections().contains(node2))
+			node1.addNode(node2);
+		if(!node2.getConnections().contains(node1))
+			node2.addNode(node1);
+	}
+
+	private void addNode(Node n) {
+		connections.add(n);
 	}
 	
-    }
-
-    /**    
-     * Helper method for connectNodes, adds one to list
-     */
-    private void addNode(Node n) {
-	connections.add(n);
-    }
-
-    /**
-     * Returns the List of Nodes that this Node is connected to
-     * @return The List of Nodes, the "connections" field
-     */
-    public List<Node> getConnections() {
-	return connections;
-    }
+	
+	/**
+	 * Disconnects the given Nodes from each other, if they're connected
+	 */
+	public static void disconnectNodes(Node node1, Node node2) {
+		if(node1.getConnections().contains(node2))
+			node1.removeNode(node2);
+		if(node2.getConnections().contains(node1))
+			node2.removeNode(node1);
+	}
+	
+	private void removeNode(Node n) {
+		connections.remove(n);
+	}
+	
+	/**
+	 * Calculates the distance between the implicit Node and the given Node
+	 * @param node The Node to calculate distance to
+	 */
+	public float distanceFrom(Node node) {
+		int changeX = tile.getColumn() - node.getTile().getColumn();
+		int changeY = tile.getRow() - node.getTile().getRow();
+		return (float) Math.sqrt(changeX*changeX + changeY*changeY);
+	}
+	
+	/**
+	 * Calculates the distance between the implicit Node and the given Tile
+	 * @param tile The Tile to calculate distance to
+	 */
+	public float distanceFrom(Tile tile) {
+		int changeX = this.tile.getColumn() - tile.getColumn();
+		int changeY = this.tile.getRow() - tile.getRow();
+		return (float) Math.sqrt(changeX*changeX + changeY*changeY);
+	}
+	
+	/**
+	 * Draws a green square at the Node's location
+	 * @param The PApplet DrawingSurface for the Node to draw in
+	 */
+	public void draw(PApplet p) {
+		p.pushStyle();
+		p.pushMatrix();
+		p.translate(tile.getColumn()*20, tile.getRow()*20 + 50);
+		
+		p.noStroke();
+		p.fill(0, 255, 0);
+		p.rect(0, 0, 20, 20);
+		
+		p.fill(0);
+		p.textSize(10);
+		p.textAlign(PApplet.CENTER, PApplet.CENTER);
+		p.text(connections.size(), 10, 10);
+		
+		p.popMatrix();
+		p.popStyle();
+	}
+	
+	/**
+	 * Returns the List of Nodes that this Node is connected to
+	 * 
+	 * @return The List of Nodes, the "connections" field
+	 */
+	public List<Node> getConnections() {
+		return connections;
+	}
 }
