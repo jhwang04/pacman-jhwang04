@@ -16,15 +16,16 @@ public class PacmanApplet extends PApplet {
 	private Player player;
 	private Ghost ghost;
 	private List<Node> nodes;
+	private List<Node> unexploredNodes;
 	
 	public static final int TITLE_SCREEN = 0;
 	public static final int GAME_SCREEN = 1;
 	public static final int[][] BOARD_TEMPLATE = new int[][] {
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 		{1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1},
-		{1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1},
-		{1, 3, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 3, 1},
-		{1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1},
+		{1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1},
+		{1, 3, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 3, 1},
+		{1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1},
 		{1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1},
 		{1, 2, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 2, 1},
 		{1, 2, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 2, 1},
@@ -65,9 +66,11 @@ public class PacmanApplet extends PApplet {
 	public PacmanApplet() {
 		level = 0;
 		screen = TITLE_SCREEN;
-		player = new Player(280, 520);
+		//player = new Player(280, 520);
+		player = new Player(30, 170);
 		ghost = new Ghost(30, 80);
 		nodes = new ArrayList<Node>();
+		unexploredNodes = new ArrayList<Node>();
 		
 		//initializes the tiles
 		for(int i = 0; i < 31; i++ ) {
@@ -133,9 +136,44 @@ public class PacmanApplet extends PApplet {
 			player.move(this);
 			player.draw(this);
 			
-			ghost.move(this);
+			//ghost.move(this);
 			ghost.draw(this);
 		}
+		
+		//System.out.println("nodes.size = " + nodes.size());
+		Node start = getNodeAt(getTile(ghost.getTileY(), ghost.getTileX()));
+		Node end = getNodeAt(getTile(player.getTileY(), player.getTileX()));
+		
+		
+		Node playerNode = null;
+		if(end == null) {
+			playerNode = new Node(getTile(player.getTileY(), player.getTileX()));
+			List<Node> neighbors = getNeighboringNodes(playerNode.getTile());
+			//System.out.println("neighbors.size = " + neighbors.size());
+			for(Node neighbor : neighbors)
+				Node.connectNodes(playerNode, neighbor);
+			Node.disconnectNodes(neighbors.get(0), neighbors.get(1));
+			nodes.add(playerNode);
+			playerNode.draw(this);
+			end = playerNode;
+			
+			drawPath(pathFind(start, end));
+			
+			//from the below if statement
+			nodes.remove(playerNode);
+			//System.out.println("playerNode.getConnections.size = " + playerNode.getConnections().size());
+			Node.connectNodes(playerNode.getConnections().get(0), playerNode.getConnections().get(1));
+			Node.disconnectNodes(playerNode, playerNode.getConnections().get(0));
+			Node.disconnectNodes(playerNode, playerNode.getConnections().get(0));
+			//System.out.println("After disconnecting player node, nodes.size = " + nodes.size());
+		} else {
+			drawPath(pathFind(start, end));
+		}
+		
+		/*if(playerNode != null) {
+			
+		}*/
+		//System.out.println("nodes.size = " + nodes.size());
 		
 		popMatrix();
 	}
@@ -263,5 +301,83 @@ public class PacmanApplet extends PApplet {
 	private boolean isTileInRange(Tile t) {
 		return(t.getColumn() > -1 && t.getColumn() < 29 && t.getRow() > -1 && t.getColumn() < 32);
 	}
+	
+	private int getIndexOf(Node n) {
+		return nodes.indexOf(n);
+	}
+	
+	private void resetTentativeCosts() {
+		for(Node node : nodes) {
+			node.setTentativeCost(100000);
+		}
+	}
+	
+	private void resetPathTo() {
+		for(Node node : nodes) {
+			node.setPathTo(null);
+		}
+	}
+	
+	private void populateUnexploredNodes() {
+		unexploredNodes.clear();
+		for(Node node : nodes) {
+			unexploredNodes.add(node);
+		}
+	}
+	
+	private Node getLeastNode() {
+		Node smallestCost = unexploredNodes.get(0);
+		for(Node node : unexploredNodes) {
+			if(node.getTentativeCost() <= smallestCost.getTentativeCost())
+				smallestCost = node;
+		}
+		return smallestCost;
+	}
+	
+	private List<Node> pathFind(Node start, Node finish) {
+		List<Node> path = new ArrayList<Node>();
+		populateUnexploredNodes();
+		start.setTentativeCost(0);
+		while(unexploredNodes.size() > 0) {
+			//System.out.println("unexplorednodes.size = " + unexploredNodes.size());
+			Node currentNode = getLeastNode();
+			//System.out.println("currentNode = " + nodes.indexOf(currentNode));
+			unexploredNodes.remove(currentNode);
+			
+			if(currentNode.equals(finish))
+				break;
+			
+			for(Node nextNode : currentNode.getConnections()) {
+				if(nextNode.getTentativeCost() > currentNode.getTentativeCost() + currentNode.distanceFrom(nextNode.getTile())) {
+					nextNode.setTentativeCost((int) (currentNode.getTentativeCost() + currentNode.distanceFrom(nextNode.getTile())));
+					//System.out.println("new cost = " + (int) (currentNode.getTentativeCost() + currentNode.distanceFrom(nextNode.getTile())));
+					nextNode.setPathTo(currentNode);
+				}
+			}
+		}
+		Node backtrackingNode = finish;
+		while(!backtrackingNode.equals(start)) {
+			path.add(backtrackingNode);
+			backtrackingNode = backtrackingNode.getPathTo();
+		}
+		path.add(start);
+		
+		resetTentativeCosts();
+		resetPathTo();
+		
+		return path;
+	}
+	
+	private void drawPath(List<Node> path) {
+		pushStyle();
+		stroke(0, 255, 0);
+		for(int i = 1; i < path.size(); i++) {
+			System.out.println("i, i-1 = " + i + ", " + (i-1));
+			line(path.get(i).getTile().getColumn()*20 + 10, path.get(i).getTile().getRow()*20 + 60, path.get(i-1).getTile().getColumn()*20 + 10, path.get(i-1).getTile().getRow()*20 + 60);
+		}
+		popStyle();
+	}
+	
+	
 }
 

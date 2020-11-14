@@ -24,7 +24,12 @@ public class Node {
 	/**
 	 * Score that will be used by A* pathfinding, hopefully
 	 */
-	private int currentScore;
+	private int tentativeCost;
+	
+	/**
+	 * Node that leads to this one
+	 */
+	private Node pathTo;
 	
 	/**
 	 * Creates a new node at the location of the given Tile
@@ -33,7 +38,7 @@ public class Node {
 	 */
 	public Node(Tile tile) {
 		this.tile = tile;
-		currentScore = 10000;
+		tentativeCost = 100000;
 		connections = new ArrayList<Node>();
 	}
 
@@ -122,5 +127,37 @@ public class Node {
 	 */
 	public List<Node> getConnections() {
 		return connections;
+	}
+	
+	/**
+	 * Returns the tentative cost of the Node
+	 * @return The tentative cost of the Node
+	 */
+	public int getTentativeCost() {
+		return tentativeCost;
+	}
+	
+	/**
+	 * Sets the tentative cost of the Node
+	 * @param cost New tentative cost of the Node
+	 */
+	public void setTentativeCost(int cost) {
+		tentativeCost = cost;
+	}
+	
+	/**
+	 * Returns the Node that leads to this one (shortest distance)
+	 * @return The Node that leads to this one
+	 */
+	public Node getPathTo() {
+		return pathTo;
+	}
+	
+	/**
+	 * Sets the Node that leads to this one (shortest distance)
+	 * @param node The new Node that leads to this one
+	 */
+	public void setPathTo(Node node) {
+		pathTo = node;
 	}
 }
