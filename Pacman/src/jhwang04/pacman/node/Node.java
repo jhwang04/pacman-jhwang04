@@ -40,6 +40,9 @@ public class Node {
 		this.tile = tile;
 		tentativeCost = 100000;
 		connections = new ArrayList<Node>();
+		for(int i = 0; i < 4; i++) {
+			connections.add(null);
+		}
 	}
 
 	/**
@@ -53,14 +56,25 @@ public class Node {
 	 * Connects the given Nodes to each other, if they aren't already
 	 */
 	public static void connectNodes(Node node1, Node node2) {
-		if(!node1.getConnections().contains(node2))
-			node1.addNode(node2);
-		if(!node2.getConnections().contains(node1))
-			node2.addNode(node1);
+		if(node1 != null && node2 != null) {
+			if(!node1.getConnections().contains(node2))
+				node1.addNode(node2);
+			if(!node2.getConnections().contains(node1))
+				node2.addNode(node1);
+		}
 	}
 
 	private void addNode(Node n) {
-		connections.add(n);
+		if(n.getTile().getRow() < tile.getRow())
+			connections.set(0, n);
+		else if(n.getTile().getColumn() > tile.getColumn())
+			connections.set(1, n);
+		else if(n.getTile().getRow() > tile.getRow())
+			connections.set(2, n);
+		else if(n.getTile().getColumn() < tile.getColumn())
+			connections.set(3, n);
+		
+		//connections.add(n);
 	}
 	
 	
@@ -68,10 +82,16 @@ public class Node {
 	 * Disconnects the given Nodes from each other, if they're connected
 	 */
 	public static void disconnectNodes(Node node1, Node node2) {
-		if(node1.getConnections().contains(node2))
+		/*if(node1.getConnections().contains(node2))
 			node1.removeNode(node2);
 		if(node2.getConnections().contains(node1))
-			node2.removeNode(node1);
+			node2.removeNode(node1);*/
+		List<Node> n1 = node1.getConnections();
+		List<Node> n2 = node2.getConnections();
+		if(n1.contains(node2))
+			n1.set(n1.indexOf(node2), null);
+		if(n2.contains(node1))
+			n2.set(n2.indexOf(node1), null);
 	}
 	
 	private void removeNode(Node n) {

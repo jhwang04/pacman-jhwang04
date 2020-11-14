@@ -152,7 +152,7 @@ public class PacmanApplet extends PApplet {
 			//System.out.println("neighbors.size = " + neighbors.size());
 			for(Node neighbor : neighbors)
 				Node.connectNodes(playerNode, neighbor);
-			Node.disconnectNodes(neighbors.get(0), neighbors.get(1));
+			//Node.disconnectNodes(neighbors.get(0), neighbors.get(1));
 			nodes.add(playerNode);
 			playerNode.draw(this);
 			end = playerNode;
@@ -162,9 +162,13 @@ public class PacmanApplet extends PApplet {
 			//from the below if statement
 			nodes.remove(playerNode);
 			//System.out.println("playerNode.getConnections.size = " + playerNode.getConnections().size());
-			Node.connectNodes(playerNode.getConnections().get(0), playerNode.getConnections().get(1));
-			Node.disconnectNodes(playerNode, playerNode.getConnections().get(0));
-			Node.disconnectNodes(playerNode, playerNode.getConnections().get(0));
+			if(playerNode.getConnections().get(0) != null)
+				Node.connectNodes(playerNode.getConnections().get(0), playerNode.getConnections().get(2));
+			if(playerNode.getConnections().get(1) != null)
+				Node.connectNodes(playerNode.getConnections().get(1), playerNode.getConnections().get(3));
+			//Node.connectNodes(playerNode.getConnections().get(0), playerNode.getConnections().get(1));
+			//Node.disconnectNodes(playerNode, playerNode.getConnections().get(0));
+			//Node.disconnectNodes(playerNode, playerNode.getConnections().get(0));
 			//System.out.println("After disconnecting player node, nodes.size = " + nodes.size());
 		} else {
 			drawPath(pathFind(start, end));
@@ -233,14 +237,18 @@ public class PacmanApplet extends PApplet {
 		Node rightNeighbor = getNodeInDirection("right", row, column);
 		Node leftNeighbor = getNodeInDirection("left", row, column);
 		
-		if(aboveNeighbor != null)
+		/*if(aboveNeighbor != null)
 			neighbors.add(aboveNeighbor);
-		if(belowNeighbor != null)
-			neighbors.add(belowNeighbor);
 		if(rightNeighbor != null)
 			neighbors.add(rightNeighbor);
+		if(belowNeighbor != null)
+			neighbors.add(belowNeighbor);
 		if(leftNeighbor != null)
-			neighbors.add(leftNeighbor);
+			neighbors.add(leftNeighbor);*/
+		neighbors.add(aboveNeighbor);
+		neighbors.add(rightNeighbor);
+		neighbors.add(belowNeighbor);
+		neighbors.add(leftNeighbor);
 		
 		return neighbors;
 	}
@@ -353,10 +361,13 @@ public class PacmanApplet extends PApplet {
 				break;
 			
 			for(Node nextNode : currentNode.getConnections()) {
-				if(nextNode.getTentativeCost() > currentNode.getTentativeCost() + currentNode.distanceFrom(nextNode.getTile())) {
-					nextNode.setTentativeCost((int) (currentNode.getTentativeCost() + currentNode.distanceFrom(nextNode.getTile())));
-					//System.out.println("new cost = " + (int) (currentNode.getTentativeCost() + currentNode.distanceFrom(nextNode.getTile())));
-					nextNode.setPathTo(currentNode);
+				//this if(nextNode == null) was added
+				if(nextNode != null) {
+					if(nextNode.getTentativeCost() > currentNode.getTentativeCost() + currentNode.distanceFrom(nextNode.getTile())) {
+						nextNode.setTentativeCost((int) (currentNode.getTentativeCost() + currentNode.distanceFrom(nextNode.getTile())));
+						//System.out.println("new cost = " + (int) (currentNode.getTentativeCost() + currentNode.distanceFrom(nextNode.getTile())));
+						nextNode.setPathTo(currentNode);
+					}
 				}
 			}
 		}
