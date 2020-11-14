@@ -255,6 +255,11 @@ public class PacmanApplet extends PApplet {
 		else if(direction.equals("up"))
 			row--;
 		
+		if(column >=28)
+			column = 0;
+		if(column <= -1)
+			column = 27;
+		
 		Tile tile = getTile(row, column);
 		if(tile.getType() == Tile.WALL) {
 			//System.out.println("escaped by hitting wall");
@@ -370,9 +375,10 @@ public class PacmanApplet extends PApplet {
 	
 	private void drawPath(List<Node> path) {
 		pushStyle();
-		stroke(0, 255, 0);
+		strokeWeight(2);
+		stroke(255, 0, 0);
 		for(int i = 1; i < path.size(); i++) {
-			System.out.println("i, i-1 = " + i + ", " + (i-1));
+			//System.out.println("i, i-1 = " + i + ", " + (i-1));
 			line(path.get(i).getTile().getColumn()*20 + 10, path.get(i).getTile().getRow()*20 + 60, path.get(i-1).getTile().getColumn()*20 + 10, path.get(i-1).getTile().getRow()*20 + 60);
 		}
 		popStyle();
