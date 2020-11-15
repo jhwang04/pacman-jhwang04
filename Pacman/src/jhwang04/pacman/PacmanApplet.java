@@ -1,6 +1,7 @@
 package jhwang04.pacman;
 
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -321,7 +322,11 @@ public class PacmanApplet extends PApplet {
 		return smallestCost;
 	}
 	
-	private List<Node> pathFind(Tile startTile, Tile finishTile) {
+	public List<Node> pathFind(Tile startTile, Tile finishTile) {
+		return pathFind(startTile, finishTile, Color.RED);
+	}
+	
+	public List<Node> pathFind(Tile startTile, Tile finishTile, Color color) {
 		Node start = getNodeAt(startTile);
 		Node finish = getNodeAt(finishTile);
 		
@@ -368,7 +373,7 @@ public class PacmanApplet extends PApplet {
 		}
 		path.add(start);
 		
-		drawPath(path);
+		drawPath(path, color);
 		
 		//original pathfind ends here
 		
@@ -387,10 +392,10 @@ public class PacmanApplet extends PApplet {
 		return path;
 	}
 	
-	private void drawPath(List<Node> path) {
+	private void drawPath(List<Node> path, Color color) {
 		pushStyle();
 		strokeWeight(2);
-		stroke(255, 0, 0);
+		stroke(color.getRed(), color.getGreen(), color.getBlue());
 		for(int i = 1; i < path.size(); i++) {
 			//System.out.println("i, i-1 = " + i + ", " + (i-1));
 			//line(path.get(i).getTile().getColumn()*20 + 10, path.get(i).getTile().getRow()*20 + 60, path.get(i-1).getTile().getColumn()*20 + 10, path.get(i-1).getTile().getRow()*20 + 60);
@@ -404,6 +409,10 @@ public class PacmanApplet extends PApplet {
 			drawPathInDirection(path.get(i).getTile().getRow(), path.get(i).getTile().getColumn(), path.get(i).getConnections().indexOf(path.get(i-1)), path.get(i-1));
 		}
 		popStyle();
+	}
+	
+	private void drawPath(List<Node> path) {
+		drawPath(path, Color.RED);
 	}
 	
 	private void drawPathInDirection(int row, int column, int direction, Node destination) {
