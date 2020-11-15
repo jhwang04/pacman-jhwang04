@@ -89,8 +89,12 @@ public class PacmanApplet extends PApplet {
 		//connects the nodes
 		for(Node node : nodes) {
 			List<Node> neighbors = getNeighboringNodes(node.getTile());
-			for(Node neighbor : neighbors)
-				Node.connectNodes(node, neighbor);
+			Tile pTile = node.getTile();
+			for(Node neighbor : neighbors) {
+				
+				Node.connectNodes(node, neighbor, neighbors.indexOf(neighbor));
+			}
+			
 			//System.out.println("Node done! row = " + node.getTile().getRow() + ", column = " + node.getTile().getColumn());
 		}
 	}
@@ -140,6 +144,8 @@ public class PacmanApplet extends PApplet {
 			ghost.draw(this);
 		}
 		
+		//System.out.println(getNodeAt(getTile(14, 6)).getConnections());
+		
 		//System.out.println("nodes.size = " + nodes.size());
 		Node start = getNodeAt(getTile(ghost.getTileY(), ghost.getTileX()));
 		Node end = getNodeAt(getTile(player.getTileY(), player.getTileX()));
@@ -150,8 +156,11 @@ public class PacmanApplet extends PApplet {
 			playerNode = new Node(getTile(player.getTileY(), player.getTileX()));
 			List<Node> neighbors = getNeighboringNodes(playerNode.getTile());
 			//System.out.println("neighbors.size = " + neighbors.size());
-			for(Node neighbor : neighbors)
-				Node.connectNodes(playerNode, neighbor);
+			Tile pTile = playerNode.getTile();
+			for(Node neighbor : neighbors) {
+				
+				Node.connectNodes(playerNode, neighbor, neighbors.indexOf(neighbor));
+			}
 			//Node.disconnectNodes(neighbors.get(0), neighbors.get(1));
 			nodes.add(playerNode);
 			playerNode.draw(this);
@@ -163,11 +172,11 @@ public class PacmanApplet extends PApplet {
 			nodes.remove(playerNode);
 			//System.out.println("playerNode.getConnections.size = " + playerNode.getConnections().size());
 			if(playerNode.getConnections().get(0) != null)
-				Node.connectNodes(playerNode.getConnections().get(0), playerNode.getConnections().get(2));
+				Node.connectNodes(playerNode.getConnections().get(0), playerNode.getConnections().get(2), 2);
 			if(playerNode.getConnections().get(1) != null)
-				Node.connectNodes(playerNode.getConnections().get(1), playerNode.getConnections().get(3));
+				Node.connectNodes(playerNode.getConnections().get(1), playerNode.getConnections().get(3), 3);
 			//Node.connectNodes(playerNode.getConnections().get(0), playerNode.getConnections().get(1));
-			//Node.disconnectNodes(playerNode, playerNode.getConnections().get(0));
+			Node.disconnectNodes(playerNode, playerNode.getConnections().get(0));
 			//Node.disconnectNodes(playerNode, playerNode.getConnections().get(0));
 			//System.out.println("After disconnecting player node, nodes.size = " + nodes.size());
 		} else {
@@ -263,17 +272,17 @@ public class PacmanApplet extends PApplet {
 		else if(direction.equals("up"))
 			row--;
 		
-		if(column >=28)
+		if(column >=28) {
+			//System.out.println("went off the right");
 			column = 0;
-		if(column <= -1)
+		} else if(column <= -1) {
+			//System.out.println("went off the left");
 			column = 27;
+		}
 		
 		Tile tile = getTile(row, column);
 		if(tile.getType() == Tile.WALL) {
 			//System.out.println("escaped by hitting wall");
-			return null;
-		} else if(!isTileInRange(tile)) {
-			//System.out.println("escaped by going out of bounds");
 			return null;
 		} else if(isNode(tile.getRow(), tile.getColumn())) {
 			//System.out.println("escaped by finding node");
@@ -390,11 +399,49 @@ public class PacmanApplet extends PApplet {
 		stroke(255, 0, 0);
 		for(int i = 1; i < path.size(); i++) {
 			//System.out.println("i, i-1 = " + i + ", " + (i-1));
-			line(path.get(i).getTile().getColumn()*20 + 10, path.get(i).getTile().getRow()*20 + 60, path.get(i-1).getTile().getColumn()*20 + 10, path.get(i-1).getTile().getRow()*20 + 60);
+			//line(path.get(i).getTile().getColumn()*20 + 10, path.get(i).getTile().getRow()*20 + 60, path.get(i-1).getTile().getColumn()*20 + 10, path.get(i-1).getTile().getRow()*20 + 60);
+			//System.out.println(path.get(i).getConnections().indexOf(path.get(i-1)));
+	
+			/*for(Node node : path) {
+				System.out.print(node + ", ");
+			}*/
+			
+			//System.out.println("\npath.size = " + path.size());
+			drawPathInDirection(path.get(i).getTile().getRow(), path.get(i).getTile().getColumn(), path.get(i).getConnections().indexOf(path.get(i-1)), path.get(i-1));
 		}
 		popStyle();
 	}
 	
+	private void drawPathInDirection(int row, int column, int direction, Node destination) {
+		int oldRow = row;
+		int oldColumn = column;
+		
+		if(direction == 0) { //up
+			row--;
+			line(oldColumn * 20 + 10, oldRow * 20 + 60, oldColumn * 20 + 10, oldRow * 20 + 40);
+		} else if(direction == 1) { //right
+			column++;
+			line(oldColumn * 20 + 10, oldRow * 20 + 60, oldColumn * 20 + 30, oldRow * 20 + 60);
+		} else if(direction == 2) { //down
+			row++;
+			line(oldColumn * 20 + 10, oldRow * 20 + 60, oldColumn * 20 + 10, oldRow * 20 + 80);
+		} else if(direction == 3) { //left
+			column--;
+			line(oldColumn * 20 + 10, oldRow * 20 + 60, oldColumn * 20 - 10, oldRow * 20 + 60);
+		}
+
+		if(column >=28)
+			column = 0;
+		if(column <= -1)
+			column = 27;
+		
+		
+		//line(oldColumn*20 + 10, oldRow*20 + 60, column*20 + 10, row*20 + 60);
+		
+		//System.out.println("current location is (" + column + ", " + row + "), destination is (" + destination.getTile().getColumn() + ", " + destination.getTile().getRow() + ")");
+		if(row != destination.getTile().getRow() || column != destination.getTile().getColumn())
+			drawPathInDirection(row, column, direction, destination);
+	}
 	
 }
 

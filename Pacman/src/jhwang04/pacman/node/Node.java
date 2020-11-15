@@ -54,24 +54,27 @@ public class Node {
 
 	/**
 	 * Connects the given Nodes to each other, if they aren't already
+	 * @param node1 The first Node to connect
+	 * @param node2 The second Node to connect
+	 * @param direction The direction of the second, relative to the first (up = 0, right = 1, down = 2, left = 3)
 	 */
-	public static void connectNodes(Node node1, Node node2) {
+	public static void connectNodes(Node node1, Node node2, int direction) {
 		if(node1 != null && node2 != null) {
 			if(!node1.getConnections().contains(node2))
-				node1.addNode(node2);
+				node1.addNode(node2, direction);
 			if(!node2.getConnections().contains(node1))
-				node2.addNode(node1);
+				node2.addNode(node1, (direction+2)%4);
 		}
 	}
 
-	private void addNode(Node n) {
-		if(n.getTile().getRow() < tile.getRow())
+	private void addNode(Node n, int direction) {
+		if(direction == 0)
 			connections.set(0, n);
-		else if(n.getTile().getColumn() > tile.getColumn())
+		else if(direction == 1)
 			connections.set(1, n);
-		else if(n.getTile().getRow() > tile.getRow())
+		else if(direction == 2)
 			connections.set(2, n);
-		else if(n.getTile().getColumn() < tile.getColumn())
+		else if(direction == 3)
 			connections.set(3, n);
 		
 		//connections.add(n);
@@ -86,12 +89,14 @@ public class Node {
 			node1.removeNode(node2);
 		if(node2.getConnections().contains(node1))
 			node2.removeNode(node1);*/
-		List<Node> n1 = node1.getConnections();
-		List<Node> n2 = node2.getConnections();
-		if(n1.contains(node2))
-			n1.set(n1.indexOf(node2), null);
-		if(n2.contains(node1))
-			n2.set(n2.indexOf(node1), null);
+		if(node1 != null && node2 != null) {
+			List<Node> n1 = node1.getConnections();
+			List<Node> n2 = node2.getConnections();
+			if(n1.contains(node2))
+				n1.set(n1.indexOf(node2), null);
+			if(n2.contains(node1))
+				n2.set(n2.indexOf(node1), null);
+		}
 	}
 	
 	private void removeNode(Node n) {
@@ -129,12 +134,18 @@ public class Node {
 		
 		p.noStroke();
 		p.fill(0, 255, 0);
-		p.rect(0, 0, 20, 20);
+		p.rect(4, 4, 12, 12);
+		
+		int nonNullConnections = 0;
+		for(Node node : connections) {
+			if(node != null)
+				nonNullConnections++;
+		}
 		
 		p.fill(0);
 		p.textSize(10);
 		p.textAlign(PApplet.CENTER, PApplet.CENTER);
-		p.text(connections.size(), 10, 10);
+		p.text(nonNullConnections, 10, 10);
 		
 		p.popMatrix();
 		p.popStyle();
@@ -179,5 +190,9 @@ public class Node {
 	 */
 	public void setPathTo(Node node) {
 		pathTo = node;
+	}
+	
+	public String toString() {
+		return "(" + tile.getColumn() + ", " + tile.getRow() + ")";
 	}
 }
