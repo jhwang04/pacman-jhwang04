@@ -66,8 +66,8 @@ public class PacmanApplet extends PApplet {
 	public PacmanApplet() {
 		level = 0;
 		screen = TITLE_SCREEN;
-		//player = new Player(280, 520);
-		player = new Player(30, 170);
+		player = new Player(280, 520);
+		//player = new Player(30, 170);
 		ghost = new Ghost(30, 80);
 		nodes = new ArrayList<Node>();
 		unexploredNodes = new ArrayList<Node>();
