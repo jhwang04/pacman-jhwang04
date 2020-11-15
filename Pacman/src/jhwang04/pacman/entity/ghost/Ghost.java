@@ -1,5 +1,6 @@
 package jhwang04.pacman.entity.ghost;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +35,13 @@ public class Ghost extends Entity {
 	
 	public void move(PacmanApplet p) {
 		Tile currentTile = p.getTile(getTileY(), getTileX());
-		targetTile = p.getTile(p.getPlayer().getTileY(), p.getPlayer().getTileX());
+		
+		Player player = p.getPlayer();
+		if(targetTile.getRow() == -1)
+			targetTile = p.getTile(p.getPlayer().getTileY(), p.getPlayer().getTileX());
+		int tx = targetTile.getColumn();
+		int ty = targetTile.getRow();
+		p.pathFind(p.getTile(getTileY(), getTileX()), targetTile, Color.RED);
 		
 		if(!currentTile.equals(lastTile)) {
 			decideDirection(p);
@@ -58,14 +65,12 @@ public class Ghost extends Entity {
 			setYInTile(10.0);
 		}
 		
+		targetTile = p.getTile(p.getPlayer().getTileY(), p.getPlayer().getTileX());
 	}
 	
 	public void decideDirection(PacmanApplet p) {
-		Player player = p.getPlayer();
-		int tx = player.getTileX();
-		int ty = player.getTileY();
 		
-		Tile above = p.getTile(getTileY() - 1, getTileX());
+		/*Tile above = p.getTile(getTileY() - 1, getTileX());
 		Tile below = p.getTile(getTileY() + 1, getTileX());
 		Tile left = p.getTile(getTileY(), getTileX() - 1);
 		Tile right = p.getTile(getTileY(), getTileX() + 1);
@@ -97,7 +102,7 @@ public class Ghost extends Entity {
 				setDirection("left");
 		}
 		
-		if(possibilities.size() >= 2) { //when pacman reaches a true decision point
+		if(possibilities.size() >= 2) { //when ghost reaches a true decision point
 			Tile choice = new Tile(100, 100, 0);
 			for(Tile tile : possibilities) {
 				if(tile.distanceTo(targetTile) <= choice.distanceTo(targetTile))
@@ -112,8 +117,7 @@ public class Ghost extends Entity {
 				setDirection("down");
 			else if(tilesAreEqual(above, choice))
 				setDirection("up");
-		}
-		
+		}*/
 		
 		
 	}

@@ -140,12 +140,12 @@ public class PacmanApplet extends PApplet {
 			player.draw(this);
 			
 			
-			//ghost.move(this);
+			ghost.move(this);
 			ghost.draw(this);
 		}
 		
 		
-		pathFind(getTile(ghost.getTileY(), ghost.getTileX()), getTile(player.getTileY(), player.getTileX()));
+		//pathFind(getTile(ghost.getTileY(), ghost.getTileX()), getTile(player.getTileY(), player.getTileX()));
 		
 		popMatrix();
 	}
