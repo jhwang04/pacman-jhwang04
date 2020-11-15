@@ -134,54 +134,19 @@ public class PacmanApplet extends PApplet {
 		
 		drawTiles();
 		
-		drawNodes();
+		//drawNodes();
 		
 		if(getTile(player.getTileY(), player.getTileX()) != getTile(ghost.getTileY(), ghost.getTileX())) {
 			player.move(this);
 			player.draw(this);
 			
+			
 			//ghost.move(this);
 			ghost.draw(this);
 		}
 		
-		//System.out.println(getNodeAt(getTile(14, 6)).getConnections());
 		
-		//System.out.println("nodes.size = " + nodes.size());
-		Node start = getNodeAt(getTile(ghost.getTileY(), ghost.getTileX()));
-		Node end = getNodeAt(getTile(player.getTileY(), player.getTileX()));
-		
-		
-		Node playerNode = null;
-		if(end == null) {
-			playerNode = new Node(getTile(player.getTileY(), player.getTileX()));
-			List<Node> neighbors = getNeighboringNodes(playerNode.getTile());
-			//System.out.println("neighbors.size = " + neighbors.size());
-			Tile pTile = playerNode.getTile();
-			for(Node neighbor : neighbors) {
-				
-				Node.connectNodes(playerNode, neighbor, neighbors.indexOf(neighbor));
-			}
-			//Node.disconnectNodes(neighbors.get(0), neighbors.get(1));
-			nodes.add(playerNode);
-			playerNode.draw(this);
-			end = playerNode;
-			
-			drawPath(pathFind(start, end));
-			
-			//from the below if statement
-			nodes.remove(playerNode);
-			//System.out.println("playerNode.getConnections.size = " + playerNode.getConnections().size());
-			if(playerNode.getConnections().get(0) != null)
-				Node.connectNodes(playerNode.getConnections().get(0), playerNode.getConnections().get(2), 2);
-			if(playerNode.getConnections().get(1) != null)
-				Node.connectNodes(playerNode.getConnections().get(1), playerNode.getConnections().get(3), 3);
-			//Node.connectNodes(playerNode.getConnections().get(0), playerNode.getConnections().get(1));
-			Node.disconnectNodes(playerNode, playerNode.getConnections().get(0));
-			//Node.disconnectNodes(playerNode, playerNode.getConnections().get(0));
-			//System.out.println("After disconnecting player node, nodes.size = " + nodes.size());
-		} else {
-			drawPath(pathFind(start, end));
-		}
+		List<Node> path = pathFind(getTile(ghost.getTileY(), ghost.getTileX()), getTile(player.getTileY(), player.getTileX()));
 		
 		/*if(playerNode != null) {
 			
@@ -356,7 +321,23 @@ public class PacmanApplet extends PApplet {
 		return smallestCost;
 	}
 	
-	private List<Node> pathFind(Node start, Node finish) {
+	private List<Node> pathFind(Tile startTile, Tile finishTile) {
+		Node start = getNodeAt(startTile);
+		Node finish = getNodeAt(finishTile);
+		
+		boolean wasFinishNull = false;
+		if(finish == null) {
+			wasFinishNull = true;
+			finish = new Node(getTile(player.getTileY(), player.getTileX()));
+			List<Node> neighbors = getNeighboringNodes(finish.getTile());
+			for(Node neighbor : neighbors) {
+				Node.connectNodes(finish, neighbor, neighbors.indexOf(neighbor));
+			}
+			nodes.add(finish);
+		}
+		
+		//original pathFind starts here
+		
 		List<Node> path = new ArrayList<Node>();
 		populateUnexploredNodes();
 		start.setTentativeCost(0);
@@ -386,6 +367,19 @@ public class PacmanApplet extends PApplet {
 			backtrackingNode = backtrackingNode.getPathTo();
 		}
 		path.add(start);
+		
+		drawPath(path);
+		
+		//original pathfind ends here
+		
+		if(wasFinishNull == true) {
+			nodes.remove(finish);
+			if(finish.getConnections().get(0) != null)
+				Node.connectNodes(finish.getConnections().get(0), finish.getConnections().get(2), 2);
+			if(finish.getConnections().get(1) != null)
+				Node.connectNodes(finish.getConnections().get(1), finish.getConnections().get(3), 3);
+			Node.disconnectNodes(finish, finish.getConnections().get(0));
+		}
 		
 		resetTentativeCosts();
 		resetPathTo();

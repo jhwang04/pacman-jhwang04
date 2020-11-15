@@ -136,7 +136,7 @@ public class Node {
 		p.fill(0, 255, 0);
 		p.rect(4, 4, 12, 12);
 		
-		int nonNullConnections = 0;
+		/*int nonNullConnections = 0;
 		for(Node node : connections) {
 			if(node != null)
 				nonNullConnections++;
@@ -145,7 +145,7 @@ public class Node {
 		p.fill(0);
 		p.textSize(10);
 		p.textAlign(PApplet.CENTER, PApplet.CENTER);
-		p.text(nonNullConnections, 10, 10);
+		p.text(nonNullConnections, 10, 10);*/
 		
 		p.popMatrix();
 		p.popStyle();
