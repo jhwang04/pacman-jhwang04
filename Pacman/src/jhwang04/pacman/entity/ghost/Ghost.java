@@ -49,7 +49,7 @@ public class Ghost extends Entity {
 		Tile currentTile = p.getTile(getTileY(), getTileX());
 		//if(p.getNodeAt(currentTile) != null)
 		//	lastNode = p.getNodeAt(currentTile);
-		boolean startedInANode = (p.getNodeAt(currentTile) != null);
+		//boolean startedInANode = (p.getNodeAt(currentTile) != null);
 		
 		
 		Player player = p.getPlayer();
@@ -57,7 +57,7 @@ public class Ghost extends Entity {
 			targetTile = p.getTile(p.getPlayer().getTileY(), p.getPlayer().getTileX());
 		int tx = targetTile.getColumn();
 		int ty = targetTile.getRow();
-		List<Node> path = p.pathFind(p.getTile(getTileY(), getTileX()), targetTile, pathColor, lastNode);
+		List<Node> path = p.pathFind(p.getTile(getTileY(), getTileX()), targetTile, pathColor, (getDirection()+2)%4);
 		
 		
 		
@@ -90,12 +90,12 @@ public class Ghost extends Entity {
 			setX(27*20 + 10);
 		
 		
-		Tile newCurrentTile = p.getTile(getTileY(), getTileX());
+		/*Tile newCurrentTile = p.getTile(getTileY(), getTileX());
 		if(p.getNodeAt(newCurrentTile) == null && startedInANode) {
 			
 			lastNode = p.getNodeAt(currentTile);
 			System.out.println("lastNode = " + lastNode);
-		}
+		}*/
 		
 		targetTile = p.getTile(p.getPlayer().getTileY(), p.getPlayer().getTileX());
 	}
@@ -189,6 +189,19 @@ public class Ghost extends Entity {
 			break;
 		
 		}
+	}
+	
+	private int getDirection() {
+		if(getUp() == true)
+			return 0;
+		else if(getRight() == true)
+			return 1;
+		else if(getDown() == true)
+			return 2;
+		else if(getLeft() == true)
+			return 3;
+		else
+			return -1;
 	}
 	
 	private boolean tilesAreEqual(Tile t1, Tile t2) {
