@@ -8,15 +8,27 @@ import jhwang04.pacman.PacmanApplet;
 import jhwang04.pacman.Tile;
 import jhwang04.pacman.entity.Entity;
 import jhwang04.pacman.entity.Player;
+import jhwang04.pacman.node.Node;
 
 public class Ghost extends Entity {
 	private Tile targetTile;
 	private Tile lastTile;
+	private Color pathColor;
+	private Node lastNode;
+	private Node twoNodesAgo;
 	
 	public Ghost(double x, double y) {
+		this(x, y, Color.RED);
+	}
+	
+	public Ghost(double x, double y, Color color) {
 		super(x, y, 190.0);
 		this.targetTile = new Tile(-1, -1, 0);
 		this.lastTile = new Tile(-1, -2, 0);
+		setDirection("left");
+		lastNode = null;
+		twoNodesAgo = null;
+		pathColor = color;
 	}
 	
 	public void draw(PacmanApplet p) {
@@ -35,18 +47,25 @@ public class Ghost extends Entity {
 	
 	public void move(PacmanApplet p) {
 		Tile currentTile = p.getTile(getTileY(), getTileX());
+		//if(p.getNodeAt(currentTile) != null)
+		//	lastNode = p.getNodeAt(currentTile);
+		boolean startedInANode = (p.getNodeAt(currentTile) != null);
+		
 		
 		Player player = p.getPlayer();
 		if(targetTile.getRow() == -1)
 			targetTile = p.getTile(p.getPlayer().getTileY(), p.getPlayer().getTileX());
 		int tx = targetTile.getColumn();
 		int ty = targetTile.getRow();
-		p.pathFind(p.getTile(getTileY(), getTileX()), targetTile, Color.RED);
+		List<Node> path = p.pathFind(p.getTile(getTileY(), getTileX()), targetTile, pathColor, lastNode);
 		
-		if(!currentTile.equals(lastTile)) {
-			decideDirection(p);
+		
+		
+		if(!currentTile.equals(lastTile))
 			lastTile = currentTile;
-		}
+		
+		if(p.getNodeAt(currentTile) != null && getXInTile() >= 5 && getXInTile() <= 15 && getYInTile() >= 5 && getYInTile() <= 15)
+			decideDirection(p, path);
 		
 		
 		
@@ -65,10 +84,36 @@ public class Ghost extends Entity {
 			setYInTile(10.0);
 		}
 		
+		if(currentTile.getColumn() >=28)
+			setX(0*20 + 10);
+		if(currentTile.getColumn() <= -1)
+			setX(27*20 + 10);
+		
+		
+		Tile newCurrentTile = p.getTile(getTileY(), getTileX());
+		if(p.getNodeAt(newCurrentTile) == null && startedInANode) {
+			
+			lastNode = p.getNodeAt(currentTile);
+			System.out.println("lastNode = " + lastNode);
+		}
+		
 		targetTile = p.getTile(p.getPlayer().getTileY(), p.getPlayer().getTileX());
 	}
 	
-	public void decideDirection(PacmanApplet p) {
+	public void decideDirection(PacmanApplet p, List<Node> path) {
+		Tile currentTile = p.getTile(getTileY(), getTileX());
+		if(p.getNodeAt(currentTile) != null) {
+			Tile nextNode = path.get(path.size()-2).getTile();
+			if(nextNode.getRow() < getTileY())
+				setDirection("up");
+			else if(nextNode.getColumn() > getTileX())
+				setDirection("right");
+			else if(nextNode.getRow() > getTileY())
+				setDirection("down");
+			else if(nextNode.getColumn() < getTileX())
+				setDirection("left");
+			
+		}
 		
 		/*Tile above = p.getTile(getTileY() - 1, getTileX());
 		Tile below = p.getTile(getTileY() + 1, getTileX());

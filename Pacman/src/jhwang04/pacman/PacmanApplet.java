@@ -67,9 +67,9 @@ public class PacmanApplet extends PApplet {
 	public PacmanApplet() {
 		level = 0;
 		screen = TITLE_SCREEN;
-		player = new Player(280, 520);
+		player = new Player(281, 520);
 		//player = new Player(30, 170);
-		ghost = new Ghost(30, 120);
+		ghost = new Ghost(280, 280);
 		nodes = new ArrayList<Node>();
 		unexploredNodes = new ArrayList<Node>();
 		
@@ -91,10 +91,8 @@ public class PacmanApplet extends PApplet {
 		for(Node node : nodes) {
 			List<Node> neighbors = getNeighboringNodes(node.getTile());
 			Tile pTile = node.getTile();
-			for(Node neighbor : neighbors) {
-				
+			for(Node neighbor : neighbors)
 				Node.connectNodes(node, neighbor, neighbors.indexOf(neighbor));
-			}
 		}
 	}
 	
@@ -227,7 +225,7 @@ public class PacmanApplet extends PApplet {
 		Tile tile = getTile(row, column);
 		if(tile.getType() == Tile.WALL) {
 			return null;
-		} else if(isNode(tile.getRow(), tile.getColumn())) {
+		} else if(/*isNode(tile.getRow(), tile.getColumn())*/ getNodeAt(tile) != null) {
 			return getNodeAt(tile);
 		} else
 			return getNodeInDirection(direction, row, column);
@@ -254,7 +252,7 @@ public class PacmanApplet extends PApplet {
 		return false;
 	}
 	
-	private Node getNodeAt(Tile t) {
+	public Node getNodeAt(Tile t) {
 		for(Node node : nodes) {
 			if(node.getTile().getRow() == t.getRow() && node.getTile().getColumn() == t.getColumn())
 				return node;
@@ -299,57 +297,85 @@ public class PacmanApplet extends PApplet {
 	}
 	
 	public List<Node> pathFind(Tile startTile, Tile finishTile) {
-		return pathFind(startTile, finishTile, Color.RED);
+		return pathFind(startTile, finishTile, Color.RED, null);
 	}
 	
-	public List<Node> pathFind(Tile startTile, Tile finishTile, Color color) {
+	public List<Node> pathFind(Tile startTile, Tile finishTile, Node nodeToIgnore) {
+		return pathFind(startTile, finishTile, Color.RED, nodeToIgnore);
+	}
+	
+	public List<Node> pathFind(Tile startTile, Tile finishTile, Color color, Node nodeToIgnore) {
+		//System.out.println("startTile = " + startTile + " , finishTile = " + finishTile);
 		Node start = getNodeAt(startTile);
 		Node finish = getNodeAt(finishTile);
+		
+		//System.out.println("nodes.size = " + nodes.size());
 		
 		boolean wasFinishNull = false;
 		if(finish == null) {
 			wasFinishNull = true;
 			finish = new Node(finishTile);
 			List<Node> neighbors = getNeighboringNodes(finish.getTile());
+			//System.out.println("finish.neighbors = " + neighbors);
 			for(Node neighbor : neighbors) {
 				Node.connectNodes(finish, neighbor, neighbors.indexOf(neighbor));
 			}
+			//System.out.println("finish.connections = " + finish.getConnections());
 			nodes.add(finish);
 		}
+		
+		//System.out.println("nodes.size = " + nodes.size());
 		
 		boolean wasStartNull = false;
 		if(start == null) {
 			wasStartNull = true;
 			start = new Node(startTile);
 			List<Node> neighbors = getNeighboringNodes(start.getTile());
+			//System.out.println("start.neighbors = " + neighbors);
 			for(Node neighbor : neighbors) {
 				Node.connectNodes(start, neighbor, neighbors.indexOf(neighbor));
 			}
+			//System.out.println("start.connections = " + start.getConnections());
 			nodes.add(start);
 		}
+		
+		int ignoreDirection = -1;
+		if(nodeToIgnore != null) {
+			ignoreDirection = start.getConnections().indexOf(nodeToIgnore);
+			Node.disconnectNodes(start, nodeToIgnore);
+		}
+		
+		//System.out.println("start.connections = " + start.getConnections() + " , finish.connections = " + finish.getConnections() + "\n");
 		
 		//original pathFind starts here
 		
 		List<Node> path = new ArrayList<Node>();
 		populateUnexploredNodes();
 		start.setTentativeCost(0);
+		finish.setPathTo(start);
+		//Node lastNode = getLeastNode();
 		while(unexploredNodes.size() > 0) {
 			Node currentNode = getLeastNode();
 			unexploredNodes.remove(currentNode);
 			
-			if(currentNode.equals(finish))
+			if(currentNode.equals(finish)) {
 				break;
+			}
 			
 			for(Node nextNode : currentNode.getConnections()) {
 				if(nextNode != null) {
 					if(nextNode.getTentativeCost() > currentNode.getTentativeCost() + currentNode.distanceFrom(nextNode.getTile())) {
+						//lastNode = currentNode;
 						nextNode.setTentativeCost((int) (currentNode.getTentativeCost() + currentNode.distanceFrom(nextNode.getTile())));
 						nextNode.setPathTo(currentNode);
 					}
 				}
 			}
+			
 		}
 		Node backtrackingNode = finish;
+		//backtrackingNode.setPathTo(backtrackingNode);
+		//System.out.println("start = " + start + ", finish = " + finish + ", backtrackingNode = " + backtrackingNode);
 		while(!backtrackingNode.equals(start)) {
 			path.add(backtrackingNode);
 			backtrackingNode = backtrackingNode.getPathTo();
@@ -359,6 +385,16 @@ public class PacmanApplet extends PApplet {
 		drawPath(path, color);
 		
 		//original pathfind ends here
+		
+		/*if(path.size() == 2) {
+			Node pacmanNode = path.get(0);
+			Node newNode = new Node(new Tile(pacmanNode.getTile().getRow(), pacmanNode.getTile().getColumn(), Tile.AIR));
+			path.set(0, newNode);
+		}*/
+		
+		if(ignoreDirection != -1) {
+			Node.connectNodes(start, nodeToIgnore, ignoreDirection);
+		}
 		
 		if(wasFinishNull == true) {
 			nodes.remove(finish);
@@ -378,7 +414,7 @@ public class PacmanApplet extends PApplet {
 		
 		resetTentativeCosts();
 		resetPathTo();
-		
+		//System.out.println(path);
 		return path;
 	}
 	
@@ -387,6 +423,7 @@ public class PacmanApplet extends PApplet {
 		strokeWeight(2);
 		stroke(color.getRed(), color.getGreen(), color.getBlue());
 		for(int i = 1; i < path.size(); i++) {
+			//if(!(path.size() == 2 && path.get(0).getTile().getRow() == path.get(1).getTile().getRow() && path.get(0).getTile().getColumn() == path.get(1).getTile().getColumn()))
 			drawPathInDirection(path.get(i).getTile().getRow(), path.get(i).getTile().getColumn(), path.get(i).getConnections().indexOf(path.get(i-1)), path.get(i-1));
 		}
 		popStyle();
@@ -418,6 +455,8 @@ public class PacmanApplet extends PApplet {
 			column = 0;
 		if(column <= -1)
 			column = 27;
+		
+		//System.out.println("oldColumn, column, oldRow, row = " + oldColumn + " " + column + " " + oldRow + " " + row);
 		
 		if(row != destination.getTile().getRow() || column != destination.getTile().getColumn())
 			drawPathInDirection(row, column, direction, destination);

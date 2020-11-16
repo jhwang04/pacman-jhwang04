@@ -107,4 +107,8 @@ public class Tile {
 		int changeY = getRow() - other.getRow();
 		return Math.sqrt(changeX * changeX + changeY * changeY);
 	}
+	
+	public String toString() {
+		return "("+ getColumn() + ", " + getRow() + ")";
+	}
 }
