@@ -140,6 +140,7 @@ public class PacmanApplet extends PApplet {
 			
 			ghost.move(this);
 			ghost.draw(this);
+			
 		}
 		
 		
@@ -147,6 +148,11 @@ public class PacmanApplet extends PApplet {
 		
 		popMatrix();
 	}
+	
+	/*public void mousePressed() {
+		player.move(this);
+		ghost.move(this);
+	}*/
 	
 	//helper method to draw the tiles
 	private void drawTiles() {
@@ -233,7 +239,7 @@ public class PacmanApplet extends PApplet {
 			
 	}
 	
-	private boolean isNode(int row, int column) {
+	public boolean isNode(int row, int column) {
 		Tile tile = getTile(row, column);
 		Tile above = getTile(tile.getRow()-1, tile.getColumn());
 		Tile below = getTile(tile.getRow()+1, tile.getColumn());
@@ -250,6 +256,10 @@ public class PacmanApplet extends PApplet {
 				return true;
 		}
 		return false;
+	}
+	
+	public boolean isNode(Tile t) {
+		return isNode(t.getRow(), t.getColumn());
 	}
 	
 	public Node getNodeAt(Tile t) {
@@ -297,14 +307,14 @@ public class PacmanApplet extends PApplet {
 	}
 	
 	public List<Node> pathFind(Tile startTile, Tile finishTile) {
-		return pathFind(startTile, finishTile, Color.RED, -1);
+		return pathFind(startTile, finishTile, Color.RED, null);
 	}
 	
-	public List<Node> pathFind(Tile startTile, Tile finishTile, int directionToIgnore) {
-		return pathFind(startTile, finishTile, Color.RED, directionToIgnore);
+	public List<Node> pathFind(Tile startTile, Tile finishTile, Node nodeToIgnore) {
+		return pathFind(startTile, finishTile, Color.RED, nodeToIgnore);
 	}
 	
-	public List<Node> pathFind(Tile startTile, Tile finishTile, Color color, int directionToIgnore) {
+	public List<Node> pathFind(Tile startTile, Tile finishTile, Color color, Node nodeToIgnore) {
 		//System.out.println("startTile = " + startTile + " , finishTile = " + finishTile);
 		Node start = getNodeAt(startTile);
 		Node finish = getNodeAt(finishTile);
@@ -339,14 +349,24 @@ public class PacmanApplet extends PApplet {
 			nodes.add(start);
 		}
 		
+		int ignoreDirection = -1;
+		if(nodeToIgnore != null) {
+			//System.out.println("currentNode = " + start + ", connections are " + start.getConnections());
+			ignoreDirection = start.getConnections().indexOf(nodeToIgnore);
+			Node.disconnectNodes(start, nodeToIgnore);
+			//System.out.println("lastNode = " + nodeToIgnore + ", connections are " + nodeToIgnore.getConnections());
+			//System.out.println("currentNode = " + start + ", connections are " + start.getConnections());
+		}
+		
+		
 		//int ignoreDirection = -1;
-		if(directionToIgnore != -1) {
+		/*if(directionToIgnore != -1) {
 			//ignoreDirection = start.getConnections().indexOf(nodeToIgnore);
 			Node nodeToIgnore = getNodeInDirection(directionToIgnore, start.getTile().getRow(), start.getTile().getColumn());
 			Node.disconnectNodes(start, nodeToIgnore);
-		}
+		}*/
 		
-		System.out.println("start.connections = " + start.getConnections() + " , finish.connections = " + finish.getConnections() + "\n");
+		//System.out.println("start.connections = " + start.getConnections() + " , finish.connections = " + finish.getConnections());
 		
 		//original pathFind starts here
 		
@@ -393,30 +413,40 @@ public class PacmanApplet extends PApplet {
 			path.set(0, newNode);
 		}*/
 		
-		if(directionToIgnore != -1) {
+		/*if(directionToIgnore != -1) {
 			Node nodeToIgnore = getNodeInDirection(directionToIgnore, start.getTile().getRow(), start.getTile().getColumn());
+			System.out.println(nodeToIgnore + ", " + nodeToIgnore.getConnections());
 			Node.connectNodes(start, nodeToIgnore, directionToIgnore);
+		}*/
+		if(nodeToIgnore != null) {
+			//System.out.println("start, nodeToIgnore, ignoreDirection = " + start + ", " + nodeToIgnore + ", " + ignoreDirection);
+			Node.connectNodes(start, nodeToIgnore, ignoreDirection);
 		}
 		
 		if(wasFinishNull == true) {
-			nodes.remove(finish);
 			if(finish.getConnections().get(0) != null)
 				Node.connectNodes(finish.getConnections().get(0), finish.getConnections().get(2), 2);
 			if(finish.getConnections().get(1) != null)
 				Node.connectNodes(finish.getConnections().get(1), finish.getConnections().get(3), 3);
-			}
+			nodes.remove(finish);
+		}
 		
 		if(wasStartNull == true) {
-			nodes.remove(start);
-			if(start.getConnections().get(0) != null)
+			if(start.getConnections().get(0) != null) {
 				Node.connectNodes(start.getConnections().get(0), start.getConnections().get(2), 2);
-			if(start.getConnections().get(1) != null)
+				//System.out.println("start.getConnections() 0 and 2 are " + start.getConnections().get(0) + ", " + start.getConnections().get(2));
+			}
+			if(start.getConnections().get(1) != null) {
 				Node.connectNodes(start.getConnections().get(1), start.getConnections().get(3), 3);
+				//System.out.println("start.getConnections() 1 and 3 are " + start.getConnections().get(1) + ", " + start.getConnections().get(3));
+			}
+			nodes.remove(start);
 		}
 		
 		resetTentativeCosts();
 		resetPathTo();
 		//System.out.println(path);
+		//System.out.println("");
 		return path;
 	}
 	
@@ -438,6 +468,7 @@ public class PacmanApplet extends PApplet {
 	private void drawPathInDirection(int row, int column, int direction, Node destination) {
 		int oldRow = row;
 		int oldColumn = column;
+		//System.out.println("(" + column + ", " + row + ") , destination = (" + destination.getTile().getColumn() + ", " + destination.getTile().getRow() + ")");
 		
 		if(direction == 0) { //up
 			row--;

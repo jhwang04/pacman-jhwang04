@@ -49,7 +49,7 @@ public class Ghost extends Entity {
 		Tile currentTile = p.getTile(getTileY(), getTileX());
 		//if(p.getNodeAt(currentTile) != null)
 		//	lastNode = p.getNodeAt(currentTile);
-		//boolean startedInANode = (p.getNodeAt(currentTile) != null);
+		boolean startedInANode = (p.getNodeAt(currentTile) != null);
 		
 		
 		Player player = p.getPlayer();
@@ -57,17 +57,15 @@ public class Ghost extends Entity {
 			targetTile = p.getTile(p.getPlayer().getTileY(), p.getPlayer().getTileX());
 		int tx = targetTile.getColumn();
 		int ty = targetTile.getRow();
-		List<Node> path = p.pathFind(p.getTile(getTileY(), getTileX()), targetTile, pathColor, (getDirection()+2)%4);
+		List<Node> path = p.pathFind(p.getTile(getTileY(), getTileX()), targetTile, pathColor, lastNode);
 		
 		
 		
 		if(!currentTile.equals(lastTile))
 			lastTile = currentTile;
 		
-		if(p.getNodeAt(currentTile) != null && getXInTile() >= 5 && getXInTile() <= 15 && getYInTile() >= 5 && getYInTile() <= 15)
+		if(p.isNode(currentTile) && getXInTile() >= 5 && getXInTile() <= 15 && getYInTile() >= 5 && getYInTile() <= 15)
 			decideDirection(p, path);
-		
-		
 		
 		
 		if(getUp() == true) {
@@ -90,12 +88,11 @@ public class Ghost extends Entity {
 			setX(27*20 + 10);
 		
 		
-		/*Tile newCurrentTile = p.getTile(getTileY(), getTileX());
+		Tile newCurrentTile = p.getTile(getTileY(), getTileX());
 		if(p.getNodeAt(newCurrentTile) == null && startedInANode) {
-			
+			//System.out.println("newCurrentTile = " + p.getNodeAt(newCurrentTile));
 			lastNode = p.getNodeAt(currentTile);
-			System.out.println("lastNode = " + lastNode);
-		}*/
+		}
 		
 		targetTile = p.getTile(p.getPlayer().getTileY(), p.getPlayer().getTileX());
 	}
@@ -104,13 +101,22 @@ public class Ghost extends Entity {
 		Tile currentTile = p.getTile(getTileY(), getTileX());
 		if(p.getNodeAt(currentTile) != null) {
 			Tile nextNode = path.get(path.size()-2).getTile();
-			if(nextNode.getRow() < getTileY())
+			int direction = p.getNeighboringNodes(currentTile).indexOf(path.get(path.size()-2));
+			/*if(nextNode.getRow() < getTileY())
 				setDirection("up");
 			else if(nextNode.getColumn() > getTileX())
 				setDirection("right");
 			else if(nextNode.getRow() > getTileY())
 				setDirection("down");
 			else if(nextNode.getColumn() < getTileX())
+				setDirection("left");*/
+			if(direction == 0)
+				setDirection("up");
+			if(direction == 1)
+				setDirection("right");
+			if(direction == 2)
+				setDirection("down");
+			if(direction == 3)
 				setDirection("left");
 			
 		}
