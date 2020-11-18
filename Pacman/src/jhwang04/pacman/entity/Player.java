@@ -7,10 +7,12 @@ import jhwang04.pacman.Tile;
 
 public class Player extends Entity {
 	private int score;
+	private int movementDirection;
 	
 	public Player(double x, double y) {
 		super(x, y, 200.0);
 		this.score = 0;
+		movementDirection = 0;
 	}
 	
 	public void draw(PacmanApplet p) {
@@ -27,6 +29,7 @@ public class Player extends Entity {
 	public void move(PacmanApplet p) {
 		//System.out.println("x = " + x + ", y = " + y + ", left = " + left + ", right = " + right + ", up = " + up + ", down = " + down);
 		//int direction;
+		//System.out.println(getUp() + ", " + getRight() + ", " + getDown() + ", " + getLeft());
 		Tile above = p.getTile(getTileY()-1, getTileX());
 		Tile below = p.getTile(getTileY()+1, getTileX());
 		Tile onRight = p.getTile(getTileY(), getTileX()+1);
@@ -75,21 +78,24 @@ public class Player extends Entity {
 		
 		if(getUp() == true) {
 			setY(getY() - getSpeed()/60.0);
+			movementDirection = 0;
 			setXInTile(10.0);
 		}
 		if(getDown() == true) {
 			setY(getY() + getSpeed()/60.0);
+			movementDirection = 2;
 			setXInTile(10.0);
 		}
 		if(getRight() == true) {
 			setX(getX() + getSpeed()/60.0);
+			movementDirection = 1;
 			setYInTile(10.0);
 		}
 		if(getLeft() == true) {
 			setX(getX() - getSpeed()/60.0);
+			movementDirection = 3;
 			setYInTile(10.0);
 		}
-		
 		
 		//looping mechanic
 		if(getTileX() >= 28)
@@ -106,5 +112,9 @@ public class Player extends Entity {
 		if(tileType == Tile.PELLET || tileType == Tile.POWER_PELLET)
 			p.getTile(getTileY(), getTileX()).setType(Tile.AIR);
 			
+	}
+	
+	public int getMovementDirection() {
+		return movementDirection;
 	}
 }

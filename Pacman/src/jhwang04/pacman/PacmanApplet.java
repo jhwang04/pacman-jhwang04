@@ -6,7 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jhwang04.pacman.entity.Player;
+import jhwang04.pacman.entity.ghost.BlueGhost;
 import jhwang04.pacman.entity.ghost.Ghost;
+import jhwang04.pacman.entity.ghost.OrangeGhost;
+import jhwang04.pacman.entity.ghost.PinkGhost;
+import jhwang04.pacman.entity.ghost.RedGhost;
 import jhwang04.pacman.node.Node;
 import processing.core.PApplet;
 
@@ -15,7 +19,12 @@ public class PacmanApplet extends PApplet {
 	private int screen;
 	private Tile[][] tiles = new Tile[31][28];
 	private Player player;
-	private Ghost ghost;
+	private RedGhost redGhost;
+	private OrangeGhost orangeGhost;
+	private PinkGhost pinkGhost;
+	private BlueGhost blueGhost;
+	
+	private List<Tile> trackableTiles;
 	private List<Node> nodes;
 	private List<Node> unexploredNodes;
 	
@@ -69,9 +78,13 @@ public class PacmanApplet extends PApplet {
 		screen = TITLE_SCREEN;
 		player = new Player(281, 520);
 		//player = new Player(30, 170);
-		ghost = new Ghost(280, 280);
+		redGhost = new RedGhost(250, 280);
+		orangeGhost = new OrangeGhost(270, 280);
+		blueGhost = new BlueGhost(290, 280);
+		pinkGhost = new PinkGhost(310, 280);
 		nodes = new ArrayList<Node>();
 		unexploredNodes = new ArrayList<Node>();
+		trackableTiles = new ArrayList<Tile>();
 		
 		//initializes the tiles
 		for(int i = 0; i < 31; i++ ) {
@@ -87,6 +100,16 @@ public class PacmanApplet extends PApplet {
 					nodes.add(new Node(tiles[i][j]));
 			}
 		}
+		
+		//initializes trackable tiles (for blue ghost, this algorithm can change)
+		for(int i = 0; i < 31; i++) {
+			for(int j = 0; j < 28; j++) {
+				if(getTile(i, j).getType() == Tile.PELLET || getTile(i, j).getType() == Tile.POWER_PELLET)
+					trackableTiles.add(getTile(i,j));
+			}
+		}
+		
+		
 		//connects the nodes
 		for(Node node : nodes) {
 			List<Node> neighbors = getNeighboringNodes(node.getTile());
@@ -133,13 +156,19 @@ public class PacmanApplet extends PApplet {
 		
 		//drawNodes();
 		
-		if(!player.isTouching(ghost)) {
+		if(!player.isTouching(redGhost) && !player.isTouching(blueGhost) && !player.isTouching(pinkGhost) && !player.isTouching(orangeGhost)) {
 			player.move(this);
 			player.draw(this);
 			
 			
-			ghost.move(this);
-			ghost.draw(this);
+			redGhost.move(this);
+			redGhost.draw(this);
+			blueGhost.move(this);
+			blueGhost.draw(this);
+			pinkGhost.move(this);
+			pinkGhost.draw(this);
+			orangeGhost.move(this);
+			orangeGhost.draw(this);
 			
 		}
 		
@@ -545,5 +574,21 @@ public class PacmanApplet extends PApplet {
 			drawPathInDirection(row, column, direction, destination);
 	}
 	
+	public Ghost getGhost(String color) {
+		if(color.equals("red"))
+			return redGhost;
+		return null;
+	}
+	
+	public Tile getClosestTrackableTile(Tile tile) {
+		Tile currentClosest = new Tile(-1, -1, Tile.AIR);
+		
+		for(Tile newTile : trackableTiles) {
+			if(tile.distanceTo(newTile) < tile.distanceTo(currentClosest))
+				currentClosest = newTile;
+		}
+		
+		return currentClosest;
+	}
 }
 

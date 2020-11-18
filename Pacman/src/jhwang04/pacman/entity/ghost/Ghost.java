@@ -18,7 +18,7 @@ public class Ghost extends Entity {
 	private Node twoNodesAgo;
 	
 	public Ghost(double x, double y) {
-		this(x, y, Color.RED);
+		this(x, y, new Color(200, 200, 200));
 	}
 	
 	public Ghost(double x, double y, Color color) {
@@ -36,10 +36,23 @@ public class Ghost extends Entity {
 		p.pushMatrix();
 		
 		p.noStroke();
-		p.fill(200, 200, 200);
+		p.fill(pathColor.getRed(), pathColor.getGreen(), pathColor.getBlue());
 		
 		p.translate((float) getX(), (float) getY());
 		p.ellipse(0, 0, 30, 30);
+		
+		p.popMatrix();
+		
+		//drawing the X at the target
+		p.pushMatrix();
+		
+		p.translate((float) targetTile.getColumn()*20 + 10, targetTile.getRow()*20 + 60);
+		p.strokeWeight(3);
+		p.stroke(pathColor.getRed(), pathColor.getGreen(), pathColor.getBlue());
+		
+		p.line(-8, -8, 8, 8);
+		p.line(8, -8, -8, 8);
+		
 		
 		p.popMatrix();
 		p.popStyle();
@@ -214,5 +227,42 @@ public class Ghost extends Entity {
 	
 	private boolean tilesAreEqual(Tile t1, Tile t2) {
 		return (t1.getRow() == t2.getRow() && t1.getColumn() == t2.getColumn());
+	}
+	
+	public Tile getTargetTile() {
+		return targetTile;
+	}
+	
+	public void setTargetTile(Tile tile) {
+		targetTile = tile;
+	}
+	
+	public Tile furthestTileInDirection(PacmanApplet p, int direction, int maxDistance) {
+		int distanceToWall = 0;
+		int tempRow = p.getPlayer().getTileY();
+		int tempColumn = p.getPlayer().getTileX();
+		while(distanceToWall <= maxDistance && p.getTile(tempRow, tempColumn).getType() != Tile.WALL) {
+			if(direction == 0)
+				tempRow--;
+			else if(direction == 1)
+				tempColumn++;
+			else if(direction == 2)
+				tempRow++;
+			else if(direction == 3)
+				tempColumn--;
+			distanceToWall++;
+		}
+		distanceToWall--;
+		
+		if(direction == 0)
+			return new Tile(p.getPlayer().getTileY() - distanceToWall, p.getPlayer().getTileX(), Tile.AIR);
+		else if(direction == 1) {
+			return new Tile(p.getPlayer().getTileY(), (p.getPlayer().getTileX() + distanceToWall)%28, Tile.AIR);
+		} else if(direction == 2)
+			return new Tile(p.getPlayer().getTileY() + distanceToWall, p.getPlayer().getTileX(), Tile.AIR);
+		else
+			return new Tile(p.getPlayer().getTileY(), (p.getPlayer().getTileX() - distanceToWall + 28)%28, Tile.AIR);
+		
+		
 	}
 }
