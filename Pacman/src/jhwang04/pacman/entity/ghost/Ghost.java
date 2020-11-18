@@ -106,8 +106,6 @@ public class Ghost extends Entity {
 			//System.out.println("newCurrentTile = " + p.getNodeAt(newCurrentTile));
 			lastNode = p.getNodeAt(currentTile);
 		}
-		
-		targetTile = p.getTile(p.getPlayer().getTileY(), p.getPlayer().getTileX());
 	}
 	
 	public void decideDirection(PacmanApplet p, List<Node> path) {

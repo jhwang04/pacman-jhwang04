@@ -11,6 +11,7 @@ public class RedGhost extends Ghost{
 	}
 	
 	public void move(PacmanApplet p) {
+		setTargetTile(p.getTile(p.getPlayer().getTileY(), p.getPlayer().getTileX()));
 		super.move(p);
 	}
 
