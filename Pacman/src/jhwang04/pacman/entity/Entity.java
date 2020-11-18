@@ -110,4 +110,16 @@ public class Entity {
 	public boolean getLeft() {
 		return left;
 	}
+	
+	public boolean isTouching(Entity other) {
+		if(other.getTileX() != getTileX())
+			return false;
+		if(other.getTileY() != getTileY())
+			return false;
+		if(Math.abs(other.getXInTile() - getXInTile()) > 10)
+			return false;
+		if(Math.abs(other.getYInTile() - getYInTile()) > 10)
+			return false;
+		return true;
+	}
 }

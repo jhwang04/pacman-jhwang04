@@ -101,7 +101,9 @@ public class Ghost extends Entity {
 		Tile currentTile = p.getTile(getTileY(), getTileX());
 		if(p.getNodeAt(currentTile) != null) {
 			Tile nextNode = path.get(path.size()-2).getTile();
-			int direction = p.getNeighboringNodes(currentTile).indexOf(path.get(path.size()-2));
+			//int direction = p.getNeighboringNodes(currentTile).indexOf(path.get(path.size()-2));
+			int direction = p.getDirectionToGo(currentTile, nextNode);
+			//System.out.println(direction);
 			/*if(nextNode.getRow() < getTileY())
 				setDirection("up");
 			else if(nextNode.getColumn() > getTileX())

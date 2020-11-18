@@ -133,7 +133,7 @@ public class PacmanApplet extends PApplet {
 		
 		//drawNodes();
 		
-		if(getTile(player.getTileY(), player.getTileX()) != getTile(ghost.getTileY(), ghost.getTileX())) {
+		if(!player.isTouching(ghost)) {
 			player.move(this);
 			player.draw(this);
 			
@@ -229,14 +229,60 @@ public class PacmanApplet extends PApplet {
 		
 		
 		Tile tile = getTile(row, column);
+		Tile playerTile = getTile(player.getTileY(), player.getTileX());
 		if(tile.getType() == Tile.WALL) {
 			return null;
 		} else if(/*isNode(tile.getRow(), tile.getColumn())*/ getNodeAt(tile) != null) {
 			return getNodeAt(tile);
-		} else
+		} /*else if(tile.getRow() == playerTile.getRow() && tile.getColumn() == playerTile.getColumn()) {
+			Node playerNode = new Node(playerTile);
+			return playerNode;
+		} */else
 			return getNodeInDirection(direction, row, column);
 			
 			
+	}
+	
+	public int getDirectionToGo(Tile currentTile, Tile destinationTile) {
+		int u = distanceInDirection(currentTile, destinationTile, 0);
+		int r = distanceInDirection(currentTile, destinationTile, 1);
+		int d = distanceInDirection(currentTile, destinationTile, 2);
+		int l = distanceInDirection(currentTile, destinationTile, 3);
+		//System.out.println(u + ", " + r + ", " + d + ", " + l);
+		if( u < r && u < d && u < l)
+			return 0;
+		else if(r < u && r < d && r < l)
+			return 1;
+		else if(d < u && d < r && d < l)
+			return 2;
+		else if(l < u && l < r && l < d)
+			return 3;
+		else
+			return 1;
+	}
+	
+	private int distanceInDirection(Tile currentTile, Tile destinationTile, int direction) {
+		int distance = 0;
+		Tile temporaryTile = new Tile(currentTile.getRow(), currentTile.getColumn(), Tile.AIR); 
+		while(distance < 50 && (temporaryTile.getRow() != destinationTile.getRow() || temporaryTile.getColumn() != destinationTile.getColumn())) {
+			if(direction == 0)
+				temporaryTile = new Tile(temporaryTile.getRow() - 1, temporaryTile.getColumn(), Tile.AIR);
+			else if(direction == 1) {
+				temporaryTile = new Tile(temporaryTile.getRow(), temporaryTile.getColumn() + 1, Tile.AIR);
+				if(temporaryTile.getColumn() >= 28)
+					temporaryTile = new Tile(temporaryTile.getRow(), 0, Tile.AIR);
+			} else if(direction == 2)
+				temporaryTile = new Tile(temporaryTile.getRow() + 1, temporaryTile.getColumn(), Tile.AIR);
+			else if(direction == 3) {
+				temporaryTile = new Tile(temporaryTile.getRow(), temporaryTile.getColumn() - 1, Tile.AIR);
+
+				if(temporaryTile.getColumn() <= -1)
+					temporaryTile = new Tile(temporaryTile.getRow(), 27, Tile.AIR);
+			}
+			
+			distance++;
+		}
+		return distance;
 	}
 	
 	public boolean isNode(int row, int column) {
@@ -318,6 +364,7 @@ public class PacmanApplet extends PApplet {
 		//System.out.println("startTile = " + startTile + " , finishTile = " + finishTile);
 		Node start = getNodeAt(startTile);
 		Node finish = getNodeAt(finishTile);
+		//System.out.println(nodeToIgnore);
 		
 		//System.out.println("nodes.size = " + nodes.size());
 		
@@ -402,6 +449,9 @@ public class PacmanApplet extends PApplet {
 			backtrackingNode = backtrackingNode.getPathTo();
 		}
 		path.add(start);
+		
+		//System.out.println(path);
+		//System.out.println(start.getConnections() + "\n");
 		
 		drawPath(path, color);
 		
