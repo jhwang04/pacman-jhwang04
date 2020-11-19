@@ -178,7 +178,11 @@ public class PacmanApplet extends PApplet {
 	
 	/*public void mousePressed() {
 		player.move(this);
-		pinkGhost.move(this);
+		redGhost.move(this);
+	}
+	
+	public void mouseReleased() {
+		mousePressed();
 	}*/
 	
 	//helper method to draw the tiles
@@ -539,6 +543,8 @@ public class PacmanApplet extends PApplet {
 		stroke(color.getRed(), color.getGreen(), color.getBlue());
 		for(int i = 1; i < path.size(); i++) {
 			//if(!(path.size() == 2 && path.get(0).getTile().getRow() == path.get(1).getTile().getRow() && path.get(0).getTile().getColumn() == path.get(1).getTile().getColumn()))
+			//System.out.println("direction = " + path.get(i).getConnections().indexOf(path.get(i-1)));
+			//System.out.println("path.neighbors = " + path.get(i).getConnections());
 			drawPathInDirection(path.get(i).getTile().getRow(), path.get(i).getTile().getColumn(), path.get(i).getConnections().indexOf(path.get(i-1)), path.get(i-1));
 		}
 		popStyle();
@@ -551,7 +557,7 @@ public class PacmanApplet extends PApplet {
 	private void drawPathInDirection(int row, int column, int direction, Node destination) {
 		int oldRow = row;
 		int oldColumn = column;
-		//System.out.println("(" + column + ", " + row + ") , destination = (" + destination.getTile().getColumn() + ", " + destination.getTile().getRow() + ")");
+		//System.out.println("(" + column + ", " + row + ") , destination = (" + destination.getTile().getColumn() + ", " + destination.getTile().getRow() + ") , direction = " + direction);
 		
 		if(direction == 0) { //up
 			row--;
@@ -567,7 +573,7 @@ public class PacmanApplet extends PApplet {
 			line(oldColumn * 20 + 10, oldRow * 20 + 60, oldColumn * 20 - 10, oldRow * 20 + 60);
 		}
 
-		if(column >=28)
+		if(column >= 28)
 			column = 0;
 		if(column <= -1)
 			column = 27;

@@ -22,7 +22,7 @@ public class Ghost extends Entity {
 	}
 	
 	public Ghost(double x, double y, Color color) {
-		super(x, y, 190.0);
+		super(x, y, 190.0*0.75);
 		this.targetTile = new Tile(-1, -1, 0);
 		this.lastTile = new Tile(-1, -2, 0);
 		setDirection("left");

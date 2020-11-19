@@ -10,7 +10,7 @@ public class Player extends Entity {
 	private int movementDirection;
 	
 	public Player(double x, double y) {
-		super(x, y, 200.0);
+		super(x, y, 200*0.75);
 		this.score = 0;
 		movementDirection = 0;
 	}
@@ -98,12 +98,12 @@ public class Player extends Entity {
 		}
 		
 		//looping mechanic
-		if(getTileX() >= 28)
-			setTileX(-1);
+		if(getTileX() > 27)
+			setTileX(0);
 		if(getTileY() >= 31)
 			setTileY(-1);
 		if(getTileX() < 0)
-			setTileX(28);
+			setTileX(27);
 		if(getTileY() < 0)
 			setTileY(31);
 		
