@@ -112,13 +112,15 @@ public class Entity {
 	}
 	
 	public boolean isTouching(Entity other) {
-		if(other.getTileX() != getTileX())
+		/*if(other.getTileX() != getTileX())
 			return false;
 		if(other.getTileY() != getTileY())
 			return false;
-		if(Math.abs(other.getXInTile() - getXInTile()) > 10)
+		if(Math.abs(other.getXInTile() - getXInTile()) > 14)
 			return false;
-		if(Math.abs(other.getYInTile() - getYInTile()) > 10)
+		if(Math.abs(other.getYInTile() - getYInTile()) > 14)
+			return false;*/
+		if(Math.abs(other.getX() - getX()) > 14 || Math.abs(other.getY() - getY()) > 14)
 			return false;
 		return true;
 	}

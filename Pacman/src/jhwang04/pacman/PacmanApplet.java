@@ -23,6 +23,7 @@ public class PacmanApplet extends PApplet {
 	private OrangeGhost orangeGhost;
 	private PinkGhost pinkGhost;
 	private BlueGhost blueGhost;
+	private int time;
 	
 	private List<Tile> trackableTiles;
 	private List<Node> nodes;
@@ -74,6 +75,7 @@ public class PacmanApplet extends PApplet {
 	
 	//initializes all values
 	public PacmanApplet() {
+		time = 0;
 		level = 0;
 		screen = TITLE_SCREEN;
 		player = new Player(281, 520);
@@ -150,6 +152,14 @@ public class PacmanApplet extends PApplet {
 				player.setLeft(true);
 			}
 		}
+		
+		pushStyle();
+		stroke(255);
+		textSize(20);
+		textAlign(LEFT, CENTER);
+		text("Time = " + Math.round((time/60 + (time%60)/60.0) * 1000.0)/1000.0, 30, 25);
+		time++;
+		popStyle();
 		
 		drawTiles();
 		
