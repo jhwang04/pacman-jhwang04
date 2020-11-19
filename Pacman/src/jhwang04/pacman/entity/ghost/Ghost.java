@@ -111,7 +111,11 @@ public class Ghost extends Entity {
 	public void decideDirection(PacmanApplet p, List<Node> path) {
 		Tile currentTile = p.getTile(getTileY(), getTileX());
 		if(p.getNodeAt(currentTile) != null) {
-			Tile nextNode = path.get(path.size()-2).getTile();
+			Tile nextNode;
+			if(path.size() < 2)
+				nextNode = path.get(0).getTile();
+			else
+				nextNode = path.get(path.size()-2).getTile();
 			//int direction = p.getNeighboringNodes(currentTile).indexOf(path.get(path.size()-2));
 			int direction = p.getDirectionToGo(currentTile, nextNode);
 			//System.out.println(direction);
