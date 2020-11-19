@@ -116,17 +116,14 @@ public class Ghost extends Entity {
 				nextNode = path.get(0).getTile();
 			else
 				nextNode = path.get(path.size()-2).getTile();
-			//int direction = p.getNeighboringNodes(currentTile).indexOf(path.get(path.size()-2));
 			int direction = p.getDirectionToGo(currentTile, nextNode);
-			//System.out.println(direction);
-			/*if(nextNode.getRow() < getTileY())
-				setDirection("up");
-			else if(nextNode.getColumn() > getTileX())
-				setDirection("right");
-			else if(nextNode.getRow() > getTileY())
-				setDirection("down");
-			else if(nextNode.getColumn() < getTileX())
-				setDirection("left");*/
+			
+			if(direction == -1) {
+				direction = oldDirectionPickingAlgorithm(p, currentTile);
+			}
+			
+			
+			
 			if(direction == 0)
 				setDirection("up");
 			if(direction == 1)
@@ -137,55 +134,6 @@ public class Ghost extends Entity {
 				setDirection("left");
 			
 		}
-		
-		/*Tile above = p.getTile(getTileY() - 1, getTileX());
-		Tile below = p.getTile(getTileY() + 1, getTileX());
-		Tile left = p.getTile(getTileY(), getTileX() - 1);
-		Tile right = p.getTile(getTileY(), getTileX() + 1);
-		
-		
-		
-		List<Tile> possibilities = new ArrayList<Tile>();
-		if(above.getType() != Tile.WALL && !tilesAreEqual(above, lastTile))
-			possibilities.add(above);
-		if(below.getType() != Tile.WALL && !tilesAreEqual(below, lastTile))
-			possibilities.add(below);
-		if(left.getType() != Tile.WALL && !tilesAreEqual(left, lastTile))
-			possibilities.add(left);
-		if(right.getType() != Tile.WALL && !tilesAreEqual(right, lastTile))
-			possibilities.add(right);
-		
-		//System.out.println(above.equals(p.getTile(lastTile.getRow(), lastTile.getColumn())));
-		//System.out.println(getTileY() + ", " + getTileX() + " ; lastTile = " + lastTile.getRow() + ", " + lastTile.getColumn());
-		//System.out.println(possibilities.size());
-		
-		if(possibilities.size() == 1) { //when pacman is going down a straight path, he goes to the tile he did not come from
-			if(tilesAreEqual(possibilities.get(0), above))
-				setDirection("up");
-			if(tilesAreEqual(possibilities.get(0), below))
-				setDirection("down");
-			if(tilesAreEqual(possibilities.get(0), right))
-				setDirection("right");
-			if(tilesAreEqual(possibilities.get(0), left))
-				setDirection("left");
-		}
-		
-		if(possibilities.size() >= 2) { //when ghost reaches a true decision point
-			Tile choice = new Tile(100, 100, 0);
-			for(Tile tile : possibilities) {
-				if(tile.distanceTo(targetTile) <= choice.distanceTo(targetTile))
-					choice = tile;
-			}
-			
-			if(tilesAreEqual(right, choice))
-				setDirection("right");
-			else if(tilesAreEqual(left, choice))
-				setDirection("left");
-			else if(tilesAreEqual(below, choice))
-				setDirection("down");
-			else if(tilesAreEqual(above, choice))
-				setDirection("up");
-		}*/
 		
 		
 	}
@@ -266,5 +214,43 @@ public class Ghost extends Entity {
 			return new Tile(p.getPlayer().getTileY(), (p.getPlayer().getTileX() - distanceToWall + 28)%28, Tile.AIR);
 		
 		
+	}
+	
+	private int oldDirectionPickingAlgorithm(PacmanApplet p, Tile currentTile) {
+		Tile above = p.getTile(getTileY() - 1, getTileX());
+		Tile below = p.getTile(getTileY() + 1, getTileX());
+		Tile left = p.getTile(getTileY(), getTileX() - 1);
+		Tile right = p.getTile(getTileY(), getTileX() + 1);
+		
+		
+		
+		List<Tile> possibilities = new ArrayList<Tile>();
+		/*if(above.getType() != Tile.WALL && !tilesAreEqual(above, lastTile))
+			possibilities.add(above);
+		if(right.getType() != Tile.WALL && !tilesAreEqual(right, lastTile))
+			possibilities.add(right);
+		if(below.getType() != Tile.WALL && !tilesAreEqual(below, lastTile))
+			possibilities.add(below);
+		if(left.getType() != Tile.WALL && !tilesAreEqual(left, lastTile))
+			possibilities.add(left);*/
+		possibilities.add(above);
+		possibilities.add(right);
+		possibilities.add(below);
+		possibilities.add(left);
+		
+		//int impossibleDirection = (getDirection()+2)%4;
+		int impossibleDirection = p.getDirectionToGo(currentTile, lastNode.getTile());
+		//System.out.println(impossibleDirection);
+		int newDirection = -1;
+		if(possibilities.get(0).getType() != Tile.WALL && impossibleDirection != 0)
+			newDirection = 0;
+		else if(possibilities.get(1).getType() != Tile.WALL && impossibleDirection != 1)
+			newDirection = 1;
+		else if(possibilities.get(2).getType() != Tile.WALL && impossibleDirection != 2)
+			newDirection = 2;
+		else
+			newDirection = 3;
+	
+		return newDirection;
 	}
 }

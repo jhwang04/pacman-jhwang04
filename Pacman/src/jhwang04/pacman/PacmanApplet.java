@@ -77,7 +77,6 @@ public class PacmanApplet extends PApplet {
 		level = 0;
 		screen = TITLE_SCREEN;
 		player = new Player(281, 520);
-		//player = new Player(30, 170);
 		redGhost = new RedGhost(250, 280);
 		orangeGhost = new OrangeGhost(270, 280);
 		blueGhost = new BlueGhost(290, 280);
@@ -173,14 +172,13 @@ public class PacmanApplet extends PApplet {
 		}
 		
 		
-		//pathFind(getTile(ghost.getTileY(), ghost.getTileX()), getTile(player.getTileY(), player.getTileX()));
 		
 		popMatrix();
 	}
 	
 	/*public void mousePressed() {
 		player.move(this);
-		ghost.move(this);
+		pinkGhost.move(this);
 	}*/
 	
 	//helper method to draw the tiles
@@ -287,7 +285,7 @@ public class PacmanApplet extends PApplet {
 		else if(l < u && l < r && l < d)
 			return 3;
 		else
-			return 1;
+			return -1;
 	}
 	
 	private int distanceInDirection(Tile currentTile, Tile destinationTile, int direction) {
@@ -423,6 +421,12 @@ public class PacmanApplet extends PApplet {
 			}
 			//System.out.println("start.connections = " + start.getConnections());
 			nodes.add(start);
+		}
+		
+		//handes pink turning 180s when target node is between pink's current location and old target
+		if(getNeighboringNodes(start.getTile()).contains(finish) && !getNeighboringNodes(start.getTile()).contains(nodeToIgnore)) {
+			//System.out.println("changed nodeToIgnore to finish");
+			nodeToIgnore = finish;
 		}
 		
 		int ignoreDirection = -1;

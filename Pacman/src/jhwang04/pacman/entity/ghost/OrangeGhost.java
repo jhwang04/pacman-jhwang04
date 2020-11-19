@@ -14,9 +14,10 @@ public class OrangeGhost extends Ghost{
 	public void move(PacmanApplet p) {
 		double distance = p.getTile(p.getPlayer().getTileY(), p.getPlayer().getTileX()).distanceTo(new Tile(getTileY(), getTileX(), Tile.AIR));
 		
-		if(distance < 8.0) {
+		if(distance < 8.0)
 			setTargetTile(p.getTile(29, 1));
-		}
+		else
+			setTargetTile(p.getTile(p.getPlayer().getTileY(), p.getPlayer().getTileX()));
 		
 		super.move(p);
 	}
