@@ -109,8 +109,11 @@ public class Player extends Entity {
 		
 		//eating the pellets
 		int tileType = p.getTile(getTileY(), getTileX()).getType();
-		if(tileType == Tile.PELLET || tileType == Tile.POWER_PELLET)
+		if(tileType == Tile.PELLET || tileType == Tile.POWER_PELLET) {
+			if(tileType == Tile.POWER_PELLET)
+				p.eatPowerPellet();
 			p.getTile(getTileY(), getTileX()).setType(Tile.AIR);
+		}
 			
 	}
 	

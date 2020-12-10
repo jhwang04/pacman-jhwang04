@@ -25,6 +25,8 @@ public class PacmanApplet extends PApplet {
 	private BlueGhost blueGhost;
 	private int time;
 	
+	private int ghostRunningTime;
+	
 	private List<Tile> trackableTiles;
 	private List<Node> nodes;
 	private List<Node> unexploredNodes;
@@ -76,7 +78,8 @@ public class PacmanApplet extends PApplet {
 	//initializes all values
 	public PacmanApplet() {
 		time = 0;
-		level = 0;
+		level = 1;
+		ghostRunningTime = 0;
 		screen = TITLE_SCREEN;
 		player = new Player(281, 520);
 		redGhost = new RedGhost(250, 280);
@@ -153,6 +156,16 @@ public class PacmanApplet extends PApplet {
 			}
 		}
 		
+		if(ghostRunningTime > 0) {
+			ghostRunningTime--;
+		} else if(ghostRunningTime == 0) {
+
+			redGhost.setMode(Ghost.CHASE_MODE);
+			blueGhost.setMode(Ghost.CHASE_MODE);
+			pinkGhost.setMode(Ghost.CHASE_MODE);
+			orangeGhost.setMode(Ghost.CHASE_MODE);
+		}
+		
 		pushStyle();
 		stroke(255);
 		textSize(20);
@@ -165,7 +178,12 @@ public class PacmanApplet extends PApplet {
 		
 		//drawNodes();
 		
-		if(!player.isTouching(redGhost) && !player.isTouching(blueGhost) && !player.isTouching(pinkGhost) && !player.isTouching(orangeGhost)) {
+		ghostCollisions(redGhost);
+		ghostCollisions(blueGhost);
+		ghostCollisions(orangeGhost);
+		ghostCollisions(pinkGhost);
+		
+		if(level != 0) {
 			player.move(this);
 			player.draw(this);
 			
@@ -180,7 +198,6 @@ public class PacmanApplet extends PApplet {
 			orangeGhost.draw(this);
 			
 		}
-		
 		
 		
 		popMatrix();
@@ -609,6 +626,48 @@ public class PacmanApplet extends PApplet {
 		}
 		
 		return currentClosest;
+	}
+	
+	public void eatPowerPellet() {
+		ghostRunningTime = 600;
+		reverseDirection(redGhost);
+		reverseDirection(blueGhost);
+		reverseDirection(pinkGhost);
+		reverseDirection(orangeGhost);
+		redGhost.setMode(Ghost.RUN_MODE);
+		blueGhost.setMode(Ghost.RUN_MODE);
+		pinkGhost.setMode(Ghost.RUN_MODE);
+		orangeGhost.setMode(Ghost.RUN_MODE);
+		
+	}
+	
+	private void reverseDirection(Ghost ghost) {
+		Tile above = getTile(ghost.getTileY() - 1, ghost.getTileX());
+		Tile below = getTile(ghost.getTileY() + 1, ghost.getTileX());
+		Tile left = getTile(ghost.getTileY(), ghost.getTileX() - 1);
+		Tile right = getTile(ghost.getTileY(), ghost.getTileX() + 1);
+		int direction = ghost.getDirection();
+		boolean shouldTurn = true;
+		if(((direction + 2)%4) == 0 && above.getType() == Tile.WALL)
+			shouldTurn = false;
+		else if(((direction + 2)%4) == 1 && right.getType() == Tile.WALL)
+			shouldTurn = false;
+		else if(((direction + 2)%4) == 2 && below.getType() == Tile.WALL)
+			shouldTurn = false;
+		else if(((direction + 2)%4) == 3 && left.getType() == Tile.WALL)
+			shouldTurn = false;
+		
+		if(shouldTurn == true)
+			ghost.setDirection((direction + 2)%4);
+	}
+	
+	private void ghostCollisions(Ghost ghost) {
+		if(player.isTouching(ghost)) {
+			if(ghost.getMode() == Ghost.CHASE_MODE)
+				level = 0;
+			else if(ghost.getMode() == Ghost.RUN_MODE)
+				ghost.setMode(Ghost.RETURN_MODE);
+		}
 	}
 }
 

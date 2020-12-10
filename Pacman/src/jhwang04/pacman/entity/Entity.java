@@ -39,6 +39,10 @@ public class Entity {
 		return speed;
 	}
 	
+	public void setSpeed(double d) {
+		this.speed = d;
+	}
+	
 	public int getTileX() {
 		return (int) (x/20.0);
 	}

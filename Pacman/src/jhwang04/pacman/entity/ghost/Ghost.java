@@ -15,19 +15,27 @@ public class Ghost extends Entity {
 	private Tile lastTile;
 	private Color pathColor;
 	private Node lastNode;
-	private Node twoNodesAgo;
+	private int lastMode;
+	private int mode;
+	public static final int FROZEN_MODE = 0;
+	public static final int CHASE_MODE = 1;
+	public static final int RUN_MODE = 2;
+	public static final int RETURN_MODE = 3;
+	public static final double DEFAULT_GHOST_SPEED = 190*0.75;
+	public static final double RETURN_GHOST_SPEED = 500*0.75;
+	public static final double RUN_GHOST_SPEED = 160*0.75;
 	
 	public Ghost(double x, double y) {
 		this(x, y, new Color(200, 200, 200));
 	}
 	
 	public Ghost(double x, double y, Color color) {
-		super(x, y, 190.0*0.75);
+		super(x, y, DEFAULT_GHOST_SPEED);
 		this.targetTile = new Tile(-1, -1, 0);
 		this.lastTile = new Tile(-1, -2, 0);
 		setDirection("left");
 		lastNode = null;
-		twoNodesAgo = null;
+		mode = CHASE_MODE;
 		pathColor = color;
 	}
 	
@@ -37,6 +45,11 @@ public class Ghost extends Entity {
 		
 		p.noStroke();
 		p.fill(pathColor.getRed(), pathColor.getGreen(), pathColor.getBlue());
+		
+		if(mode == RUN_MODE)
+			p.fill(0, 0, 255);
+		else if(mode == RETURN_MODE)
+			p.fill(220, 220, 220);
 		
 		p.translate((float) getX(), (float) getY());
 		p.ellipse(0, 0, 30, 30);
@@ -50,8 +63,10 @@ public class Ghost extends Entity {
 		p.strokeWeight(3);
 		p.stroke(pathColor.getRed(), pathColor.getGreen(), pathColor.getBlue());
 		
-		p.line(-8, -8, 8, 8);
-		p.line(8, -8, -8, 8);
+		if(mode == CHASE_MODE) {
+			p.line(-8, -8, 8, 8);
+			p.line(8, -8, -8, 8);
+		}
 		
 		
 		p.popMatrix();
@@ -64,21 +79,36 @@ public class Ghost extends Entity {
 		//	lastNode = p.getNodeAt(currentTile);
 		boolean startedInANode = (p.getNodeAt(currentTile) != null);
 		
-		
-		Player player = p.getPlayer();
-		if(targetTile.getRow() == -1)
-			targetTile = p.getTile(p.getPlayer().getTileY(), p.getPlayer().getTileX());
-		int tx = targetTile.getColumn();
-		int ty = targetTile.getRow();
-		List<Node> path = p.pathFind(p.getTile(getTileY(), getTileX()), targetTile, pathColor, lastNode);
-		
-		
-		
-		if(!currentTile.equals(lastTile))
+		if(mode == CHASE_MODE || mode == RUN_MODE || mode == RETURN_MODE) {
+			Player player = p.getPlayer();
+			if(targetTile.getRow() == -1)
+				targetTile = p.getTile(p.getPlayer().getTileY(), p.getPlayer().getTileX());
+			int tx = targetTile.getColumn();
+			int ty = targetTile.getRow();
+			
+			if(mode == RETURN_MODE) {
+				targetTile = p.getTile(11, 13);
+				if(getTileX() == targetTile.getColumn() && getTileY() == targetTile.getRow())
+					setMode(CHASE_MODE);
+			}
+			
+			List<Node> path;
+			if(mode == CHASE_MODE || mode == RETURN_MODE)
+				path = p.pathFind(p.getTile(getTileY(), getTileX()), targetTile, pathColor, lastNode);
+			else {
+				path = new ArrayList<Node>();
+				path.add(null);
+			}
+			if(p.isNode(currentTile) && getXInTile() >= 5 && getXInTile() <= 15 && getYInTile() >= 5 && getYInTile() <= 15 && !currentTile.equals(lastTile))
+				decideDirection(p, path);
+		}
+		if(!currentTile.equals(lastTile) && getXInTile() >= 5 && getXInTile() <= 15 && getYInTile() >= 5 && getYInTile() <= 15)
 			lastTile = currentTile;
 		
-		if(p.isNode(currentTile) && getXInTile() >= 5 && getXInTile() <= 15 && getYInTile() >= 5 && getYInTile() <= 15)
-			decideDirection(p, path);
+		
+		
+		
+		
 		
 		
 		if(getUp() == true) {
@@ -111,34 +141,52 @@ public class Ghost extends Entity {
 	public void decideDirection(PacmanApplet p, List<Node> path) {
 		Tile currentTile = p.getTile(getTileY(), getTileX());
 		if(p.getNodeAt(currentTile) != null) {
-			Tile nextNode;
-			if(path.size() < 2)
-				nextNode = path.get(0).getTile();
-			else
-				nextNode = path.get(path.size()-2).getTile();
-			int direction = p.getDirectionToGo(currentTile, nextNode);
+			int direction = -1;
 			
-			if(direction == -1) {
-				direction = oldDirectionPickingAlgorithm(p, currentTile);
+			if(mode == CHASE_MODE || mode == RETURN_MODE) {
+				Tile nextNode;
+				if(path.size() < 2)
+					nextNode = path.get(0).getTile();
+				else
+					nextNode = path.get(path.size()-2).getTile();
+				direction = p.getDirectionToGo(currentTile, nextNode);
+				
+				if(direction == -1) {
+					direction = oldDirectionPickingAlgorithm(p, currentTile);
+				}
 			}
 			
+			if(mode == RUN_MODE)
+				direction = randomDirection(p);
 			
-			
-			if(direction == 0)
-				setDirection("up");
-			if(direction == 1)
-				setDirection("right");
-			if(direction == 2)
-				setDirection("down");
-			if(direction == 3)
-				setDirection("left");
+			if(mode != FROZEN_MODE) {
+				if(direction == 0)
+					setDirection("up");
+				if(direction == 1)
+					setDirection("right");
+				if(direction == 2)
+					setDirection("down");
+				if(direction == 3)
+					setDirection("left");
+			}
 			
 		}
 		
 		
 	}
 	
-	private void setDirection(String direction) {
+	public void setDirection(int d) {
+		if(d == 0)
+			setDirection("up");
+		else if(d == 1)
+			setDirection("right");
+		else if(d == 2)
+			setDirection("down");
+		else if(d == 3)
+			setDirection("left");
+	}
+	
+	public void setDirection(String direction) {
 		setUp(false);
 		setDown(false);
 		setLeft(false);
@@ -162,7 +210,7 @@ public class Ghost extends Entity {
 		}
 	}
 	
-	private int getDirection() {
+	public int getDirection() {
 		if(getUp() == true)
 			return 0;
 		else if(getRight() == true)
@@ -252,5 +300,48 @@ public class Ghost extends Entity {
 			newDirection = 3;
 	
 		return newDirection;
+	}
+	
+	private int randomDirection(PacmanApplet p) {
+		Tile above = p.getTile(getTileY() - 1, getTileX());
+		Tile below = p.getTile(getTileY() + 1, getTileX());
+		Tile left = p.getTile(getTileY(), getTileX() - 1);
+		Tile right = p.getTile(getTileY(), getTileX() + 1);
+		
+		List<Tile> possibilities = new ArrayList<Tile>();
+		if(above.getType() != Tile.WALL && !tilesAreEqual(above, lastTile))
+			possibilities.add(above);
+		if(right.getType() != Tile.WALL && !tilesAreEqual(right, lastTile))
+			possibilities.add(right);
+		if(below.getType() != Tile.WALL && !tilesAreEqual(below, lastTile))
+			possibilities.add(below);
+		if(left.getType() != Tile.WALL && !tilesAreEqual(left, lastTile))
+			possibilities.add(left);
+		
+		int decision = (int) (Math.random() * possibilities.size());
+		if(possibilities.get(decision).equals(above))
+			return 0;
+		else if(possibilities.get(decision).equals(right))
+			return 1;
+		else if(possibilities.get(decision).equals(below))
+			return 2;
+		else if(possibilities.get(decision).equals(left))
+			return 3;
+		return decision;
+		
+	}
+	
+	public int getMode() {
+		return mode;
+	}
+	
+	public void setMode(int mode) {
+		this.mode = mode;
+		if(mode == RETURN_MODE)
+			setSpeed(RETURN_GHOST_SPEED);
+		else if(mode == RUN_MODE)
+			setSpeed(RUN_GHOST_SPEED);
+		else
+			setSpeed(DEFAULT_GHOST_SPEED);
 	}
 }
