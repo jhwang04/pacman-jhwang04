@@ -22,7 +22,7 @@ public class Ghost extends Entity {
 	public static final int RUN_MODE = 2;
 	public static final int RETURN_MODE = 3;
 	public static final double DEFAULT_GHOST_SPEED = 190*0.75;
-	public static final double RETURN_GHOST_SPEED = 500*0.75;
+	public static final double RETURN_GHOST_SPEED = 400*0.75;
 	public static final double RUN_GHOST_SPEED = 160*0.75;
 	
 	public Ghost(double x, double y) {
@@ -46,9 +46,12 @@ public class Ghost extends Entity {
 		p.noStroke();
 		p.fill(pathColor.getRed(), pathColor.getGreen(), pathColor.getBlue());
 		
-		if(mode == RUN_MODE)
-			p.fill(0, 0, 255);
-		else if(mode == RETURN_MODE)
+		if(mode == RUN_MODE) {
+			if(p.getGhostRunningTime() % 50 < 25 && p.getGhostRunningTime() < 300)
+				p.fill(255, 255, 255);
+			else
+				p.fill(0, 0, 255);
+		} else if(mode == RETURN_MODE)
 			p.fill(220, 220, 220);
 		
 		p.translate((float) getX(), (float) getY());

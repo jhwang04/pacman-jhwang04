@@ -171,7 +171,6 @@ public class PacmanApplet extends PApplet {
 		textSize(20);
 		textAlign(LEFT, CENTER);
 		text("Time = " + Math.round((time/60 + (time%60)/60.0) * 1000.0)/1000.0, 30, 25);
-		time++;
 		popStyle();
 		
 		drawTiles();
@@ -196,6 +195,7 @@ public class PacmanApplet extends PApplet {
 			pinkGhost.draw(this);
 			orangeGhost.move(this);
 			orangeGhost.draw(this);
+			time++;
 			
 		}
 		
@@ -668,6 +668,10 @@ public class PacmanApplet extends PApplet {
 			else if(ghost.getMode() == Ghost.RUN_MODE)
 				ghost.setMode(Ghost.RETURN_MODE);
 		}
+	}
+	
+	public int getGhostRunningTime() {
+		return ghostRunningTime;
 	}
 }
 
