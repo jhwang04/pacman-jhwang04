@@ -6,7 +6,7 @@ echo -----------------------------------------------------
 
 fileName=pacman-jhwang04.jar
 
-cd dist
+#cd dist
 cd bin
 
 mkdir -p libs
