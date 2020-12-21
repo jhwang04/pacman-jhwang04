@@ -648,14 +648,16 @@ public class PacmanApplet extends PApplet {
 		Tile right = getTile(ghost.getTileY(), ghost.getTileX() + 1);
 		int direction = ghost.getDirection();
 		boolean shouldTurn = true;
-		if(((direction + 2)%4) == 0 && above.getType() == Tile.WALL)
+		/*if(((direction + 2)%4) == 0 && above.getType() == Tile.WALL)
 			shouldTurn = false;
 		else if(((direction + 2)%4) == 1 && right.getType() == Tile.WALL)
 			shouldTurn = false;
 		else if(((direction + 2)%4) == 2 && below.getType() == Tile.WALL)
 			shouldTurn = false;
 		else if(((direction + 2)%4) == 3 && left.getType() == Tile.WALL)
-			shouldTurn = false;
+			shouldTurn = false;*/
+		
+		ghost.setLastTile(new Tile(-1, -1, 0));
 		
 		if(shouldTurn == true)
 			ghost.setDirection((direction + 2)%4);

@@ -128,11 +128,14 @@ public class Ghost extends Entity {
 			setYInTile(10.0);
 		}
 		
-		if(currentTile.getColumn() >=28)
+		if(currentTile.getColumn() >=28) {
 			setX(0*20 + 10);
-		if(currentTile.getColumn() <= -1)
+			//System.out.println("" + this.getClass().getSimpleName() + " looped from right side to left");
+		}
+		if(currentTile.getColumn() <= -1) {
 			setX(27*20 + 10);
-		
+			//System.out.println("" + this.getClass().getSimpleName() + " looped from left side to right");
+		}
 		
 		Tile newCurrentTile = p.getTile(getTileY(), getTileX());
 		if(p.getNodeAt(newCurrentTile) == null && startedInANode) {
@@ -346,5 +349,9 @@ public class Ghost extends Entity {
 			setSpeed(RUN_GHOST_SPEED);
 		else
 			setSpeed(DEFAULT_GHOST_SPEED);
+	}
+	
+	public void setLastTile(Tile t) {
+		lastTile = t;
 	}
 }

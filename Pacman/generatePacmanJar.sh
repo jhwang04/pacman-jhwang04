@@ -18,7 +18,7 @@ cp -R processing ../processing
 #cp -R japplemenubar ../japplemenubar
 cd ..
 rm -R ./libs
-rm ./libs/processing_core.jar
+#rm ./libs/processing_core.jar
 
 jar cvfe ../dist/$fileName jhwang04.pacman.Pacman jhwang04/pacman processing
 
