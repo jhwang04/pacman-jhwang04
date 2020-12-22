@@ -6,17 +6,18 @@ import processing.core.PApplet;
 import processing.core.PConstants;
 
 public class Button {
-	private int x, y, width, height;
+	private int x, y, width, height, textSize;
 	private boolean isHovered, isPressed;
 	private Color primaryColor, secondaryColor, textColor, borderColor;
 	private String text;
 	
-	public Button(int x, int y, int width, int height, String text, Color primaryColor, Color secondaryColor, Color textColor, Color borderColor) {
+	public Button(int x, int y, int width, int height, String text, int textSize, Color primaryColor, Color secondaryColor, Color textColor, Color borderColor) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
 		this.text = text;
+		this.textSize = textSize;
 		this.primaryColor = primaryColor;
 		this.secondaryColor = secondaryColor;
 		this.textColor = textColor;
@@ -42,7 +43,7 @@ public class Button {
 		if(isPressed == true) {
 			p.translate((float) (x + width/20.0), (float) (y + height/20.0));
 			p.rect(0, 0, width - (width/10.0f), height - (height/10.0f), 10);
-			float textSize = (float) (((width - (width/10.0f)) * 0.75 ) / text.length());
+			//float textSize = (float) (((width - (width/10.0f)) /** 0.75 */) / text.length());
 			p.textSize(textSize);
 			p.popMatrix();
 			p.fill(textColor.getRed(), textColor.getGreen(), textColor.getBlue());
@@ -50,7 +51,7 @@ public class Button {
 		} else {
 			p.translate(x, y);
 			p.rect(0, 0, width, height, 10);
-			float textSize = (float) ((width * 0.75 ) / text.length());
+			//float textSize = (float) ((width /* * 0.75*/ ) / text.length());
 			p.textSize(textSize);
 			p.popMatrix();
 			p.fill(textColor.getRed(), textColor.getGreen(), textColor.getBlue());

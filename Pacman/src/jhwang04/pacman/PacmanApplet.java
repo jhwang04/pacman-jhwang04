@@ -24,7 +24,7 @@ public class PacmanApplet extends PApplet {
 	private PinkGhost pinkGhost;
 	private BlueGhost blueGhost;
 	private int time;
-	private Button startButton;
+	private Button startButton, replayButton;
 	
 	private int ghostRunningTime;
 	
@@ -34,6 +34,8 @@ public class PacmanApplet extends PApplet {
 	
 	public static final int TITLE_SCREEN = 0;
 	public static final int GAME_SCREEN = 1;
+	public static final int GAME_OVER_SCREEN = 2;
+	public static final int HELP_SCREEN = 3;
 	public static final int[][] BOARD_TEMPLATE = new int[][] {
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 		{1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1},
@@ -86,9 +88,13 @@ public class PacmanApplet extends PApplet {
 		orangeGhost = new OrangeGhost(270, 280);
 		blueGhost = new BlueGhost(290, 280);
 		pinkGhost = new PinkGhost(310, 280);
+		
 		screen = TITLE_SCREEN;
 		nodes = new ArrayList<Node>();
-		startButton = new Button(120, 200, 340, 150, "START", Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
+		
+		startButton = new Button(120, 200, 340, 150, "START", 60, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
+		replayButton = new Button(120, 200, 340, 150, "PLAY AGAIN", 45, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
+		
 		unexploredNodes = new ArrayList<Node>();
 		trackableTiles = new ArrayList<Tile>();
 		//initializes the tiles
@@ -221,6 +227,23 @@ public class PacmanApplet extends PApplet {
 			
 			
 			popMatrix();
+		} else if(screen == GAME_OVER_SCREEN) {
+			pushMatrix();
+			scale((float) (width/560.0), (float) (height/800.0));
+			background(0);
+			
+			pushStyle();
+			textAlign(CENTER, CENTER);
+			textSize(80);
+			stroke(255);
+			text("GAME OVER", 280, 100);
+			
+			replayButton.act(mouseX, mouseY + 10, mousePressed);
+			replayButton.draw(this);
+			
+			popStyle();
+			
+			popMatrix();
 		}
 	}
 	
@@ -237,6 +260,11 @@ public class PacmanApplet extends PApplet {
 		if(screen == TITLE_SCREEN) {
 			if(startButton.getIsPressed()) {
 				startButton.act(-1, -1, false);
+				changeScreen(GAME_SCREEN);
+			}
+		} else if(screen == GAME_OVER_SCREEN) {
+			if(replayButton.getIsPressed()) {
+				replayButton.act(-1,  -1,  false);
 				changeScreen(GAME_SCREEN);
 			}
 		}
@@ -696,7 +724,7 @@ public class PacmanApplet extends PApplet {
 	private void ghostCollisions(Ghost ghost) {
 		if(player.isTouching(ghost)) {
 			if(ghost.getMode() == Ghost.CHASE_MODE)
-				level = 0;
+				changeScreen(GAME_OVER_SCREEN);
 			else if(ghost.getMode() == Ghost.RUN_MODE)
 				ghost.setMode(Ghost.RETURN_MODE);
 		}
