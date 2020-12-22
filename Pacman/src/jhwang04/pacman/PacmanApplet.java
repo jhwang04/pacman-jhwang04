@@ -24,6 +24,7 @@ public class PacmanApplet extends PApplet {
 	private PinkGhost pinkGhost;
 	private BlueGhost blueGhost;
 	private int time;
+	private Button startButton;
 	
 	private int ghostRunningTime;
 	
@@ -80,16 +81,16 @@ public class PacmanApplet extends PApplet {
 		time = 0;
 		level = 1;
 		ghostRunningTime = 0;
-		screen = TITLE_SCREEN;
 		player = new Player(281, 520);
 		redGhost = new RedGhost(250, 280);
 		orangeGhost = new OrangeGhost(270, 280);
 		blueGhost = new BlueGhost(290, 280);
 		pinkGhost = new PinkGhost(310, 280);
+		screen = TITLE_SCREEN;
 		nodes = new ArrayList<Node>();
+		startButton = new Button(120, 200, 340, 150, "START", Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
 		unexploredNodes = new ArrayList<Node>();
 		trackableTiles = new ArrayList<Tile>();
-		
 		//initializes the tiles
 		for(int i = 0; i < 31; i++ ) {
 			for(int j = 0; j < 28; j++) {
@@ -129,78 +130,98 @@ public class PacmanApplet extends PApplet {
 	}
 	
 	public void draw() {
-		pushMatrix();
-		scale((float) (width/560.0), (float) (height/800.0));
-		background(0);
-		
-		if(keyPressed) {
-			if(keyCode == UP) {
-				if(player.getUp() == false)
-					player.setDown(false);
-				player.setUp(true);
+		if(screen == TITLE_SCREEN) {
+			pushMatrix();
+			scale((float) (width/560.0), (float) (height/800.0));
+			background(0);
+			
+			pushStyle();
+			textAlign(CENTER, CENTER);
+			textSize(80);
+			stroke(255);
+			text("PAC-MAN", 280, 100);
+			
+			startButton.act(mouseX, mouseY + 10, mousePressed);
+			startButton.draw(this);
+			
+			popStyle();
+			
+			popMatrix();
+		} else if(screen == GAME_SCREEN) {
+			
+			pushMatrix();
+			scale((float) (width/560.0), (float) (height/800.0));
+			background(0);
+			
+			if(keyPressed) {
+				if(keyCode == UP) {
+					if(player.getUp() == false)
+						player.setDown(false);
+					player.setUp(true);
+				}
+				if(keyCode == DOWN) {
+					if(player.getDown() == false)
+						player.setUp(false);
+					player.setDown(true);
+				}
+				if(keyCode == RIGHT) {
+					if(player.getRight() == false)
+						player.setLeft(false);
+					player.setRight(true);
+				}
+				if(keyCode == LEFT) {
+					if(player.getLeft() == false)
+						player.setRight(false);
+					player.setLeft(true);
+				}
 			}
-			if(keyCode == DOWN) {
-				if(player.getDown() == false)
-					player.setUp(false);
-				player.setDown(true);
+			
+			if(ghostRunningTime > 0) {
+				ghostRunningTime--;
+			} else if(ghostRunningTime == 0) {
+	
+				redGhost.setMode(Ghost.CHASE_MODE);
+				blueGhost.setMode(Ghost.CHASE_MODE);
+				pinkGhost.setMode(Ghost.CHASE_MODE);
+				orangeGhost.setMode(Ghost.CHASE_MODE);
 			}
-			if(keyCode == RIGHT) {
-				if(player.getRight() == false)
-					player.setLeft(false);
-				player.setRight(true);
+			
+			pushStyle();
+			stroke(255);
+			textSize(20);
+			textAlign(LEFT, CENTER);
+			text("Time = " + Math.round((time/60 + (time%60)/60.0) * 1000.0)/1000.0, 30, 25);
+			popStyle();
+			
+			drawTiles();
+			
+			//drawNodes();
+			
+			ghostCollisions(redGhost);
+			ghostCollisions(blueGhost);
+			ghostCollisions(orangeGhost);
+			ghostCollisions(pinkGhost);
+			
+			if(level != 0) {
+				player.move(this);
+				player.draw(this);
+				
+				
+				redGhost.move(this);
+				redGhost.draw(this);
+				blueGhost.move(this);
+				blueGhost.draw(this);
+				pinkGhost.move(this);
+				pinkGhost.draw(this);
+				orangeGhost.move(this);
+				orangeGhost.draw(this);
+				time++;
+				
 			}
-			if(keyCode == LEFT) {
-				if(player.getLeft() == false)
-					player.setRight(false);
-				player.setLeft(true);
-			}
-		}
-		
-		if(ghostRunningTime > 0) {
-			ghostRunningTime--;
-		} else if(ghostRunningTime == 0) {
-
-			redGhost.setMode(Ghost.CHASE_MODE);
-			blueGhost.setMode(Ghost.CHASE_MODE);
-			pinkGhost.setMode(Ghost.CHASE_MODE);
-			orangeGhost.setMode(Ghost.CHASE_MODE);
-		}
-		
-		pushStyle();
-		stroke(255);
-		textSize(20);
-		textAlign(LEFT, CENTER);
-		text("Time = " + Math.round((time/60 + (time%60)/60.0) * 1000.0)/1000.0, 30, 25);
-		popStyle();
-		
-		drawTiles();
-		
-		//drawNodes();
-		
-		ghostCollisions(redGhost);
-		ghostCollisions(blueGhost);
-		ghostCollisions(orangeGhost);
-		ghostCollisions(pinkGhost);
-		
-		if(level != 0) {
-			player.move(this);
-			player.draw(this);
 			
 			
-			redGhost.move(this);
-			redGhost.draw(this);
-			blueGhost.move(this);
-			blueGhost.draw(this);
-			pinkGhost.move(this);
-			pinkGhost.draw(this);
-			orangeGhost.move(this);
-			orangeGhost.draw(this);
-			time++;
-			
+			popMatrix();
 		}
-		
-		
-		popMatrix();
 	}
 	
 	/*public void mousePressed() {
@@ -211,6 +232,15 @@ public class PacmanApplet extends PApplet {
 	public void mouseReleased() {
 		mousePressed();
 	}*/
+	
+	public void mouseReleased() {
+		if(screen == TITLE_SCREEN) {
+			if(startButton.getIsPressed()) {
+				startButton.act(-1, -1, false);
+				changeScreen(GAME_SCREEN);
+			}
+		}
+	}
 	
 	//helper method to draw the tiles
 	private void drawTiles() {
@@ -674,6 +704,21 @@ public class PacmanApplet extends PApplet {
 	
 	public int getGhostRunningTime() {
 		return ghostRunningTime;
+	}
+	
+	private void changeScreen(int newScreen) {
+		if(newScreen == GAME_SCREEN) {
+			time = 0;
+			level = 1;
+			ghostRunningTime = 0;
+			player = new Player(281, 520);
+			redGhost = new RedGhost(250, 280);
+			orangeGhost = new OrangeGhost(270, 280);
+			blueGhost = new BlueGhost(290, 280);
+			pinkGhost = new PinkGhost(310, 280);
+		}
+		
+		screen = newScreen;
 	}
 }
 
