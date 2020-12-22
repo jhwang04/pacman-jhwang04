@@ -185,11 +185,14 @@ public class PacmanApplet extends PApplet {
 			if(ghostRunningTime > 0) {
 				ghostRunningTime--;
 			} else if(ghostRunningTime == 0) {
-	
-				redGhost.setMode(Ghost.CHASE_MODE);
+				/*redGhost.setMode(Ghost.CHASE_MODE);
 				blueGhost.setMode(Ghost.CHASE_MODE);
 				pinkGhost.setMode(Ghost.CHASE_MODE);
-				orangeGhost.setMode(Ghost.CHASE_MODE);
+				orangeGhost.setMode(Ghost.CHASE_MODE);*/
+				endRunMode(redGhost);
+				endRunMode(blueGhost);
+				endRunMode(pinkGhost);
+				endRunMode(orangeGhost);
 			}
 			
 			pushStyle();
@@ -732,6 +735,11 @@ public class PacmanApplet extends PApplet {
 	
 	public int getGhostRunningTime() {
 		return ghostRunningTime;
+	}
+	
+	private void endRunMode(Ghost ghost) {
+		if(ghost.getMode() != Ghost.RETURN_MODE)
+			ghost.setMode(Ghost.CHASE_MODE);
 	}
 	
 	private void changeScreen(int newScreen) {
