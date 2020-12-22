@@ -27,7 +27,7 @@ public class Button {
 	public void draw(PApplet p) {
 		p.pushMatrix();
 		p.pushStyle();
-		p.textAlign(PConstants.CENTER);
+		p.textAlign(PConstants.CENTER, PConstants.CENTER);
 		
 		Color fillColor;
 		if(isHovered == true)
@@ -47,7 +47,7 @@ public class Button {
 			p.textSize(textSize);
 			p.popMatrix();
 			p.fill(textColor.getRed(), textColor.getGreen(), textColor.getBlue());
-			p.text(text, x + width/2, y + height/2 + textSize/4);
+			p.text(text, x + width/2, y + height/2 -10/*+ textSize*3/4*/);
 		} else {
 			p.translate(x, y);
 			p.rect(0, 0, width, height, 10);
@@ -55,7 +55,7 @@ public class Button {
 			p.textSize(textSize);
 			p.popMatrix();
 			p.fill(textColor.getRed(), textColor.getGreen(), textColor.getBlue());
-			p.text(text, x + width/2, y + height/2 + textSize/4);
+			p.text(text, x + width/2, y + height/2 -10/*+ textSize/4*/);
 		}
 		
 		

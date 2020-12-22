@@ -23,7 +23,7 @@ public class PacmanApplet extends PApplet {
 	private OrangeGhost orangeGhost;
 	private PinkGhost pinkGhost;
 	private BlueGhost blueGhost;
-	private int time;
+	private int time, freezeTime;
 	private Button startButton, replayButton;
 	
 	private int ghostRunningTime;
@@ -36,6 +36,7 @@ public class PacmanApplet extends PApplet {
 	public static final int GAME_SCREEN = 1;
 	public static final int GAME_OVER_SCREEN = 2;
 	public static final int HELP_SCREEN = 3;
+	public static final int LEVEL_COMPLETE_SCREEN = 4;
 	public static final int[][] BOARD_TEMPLATE = new int[][] {
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 		{1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1},
@@ -81,6 +82,7 @@ public class PacmanApplet extends PApplet {
 	//initializes all values
 	public PacmanApplet() {
 		time = 0;
+		freezeTime = 0;
 		level = 1;
 		ghostRunningTime = 0;
 		player = new Player(281, 520);
@@ -89,45 +91,12 @@ public class PacmanApplet extends PApplet {
 		blueGhost = new BlueGhost(290, 280);
 		pinkGhost = new PinkGhost(310, 280);
 		
-		screen = TITLE_SCREEN;
-		nodes = new ArrayList<Node>();
-		
 		startButton = new Button(120, 200, 340, 150, "START", 60, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
 		replayButton = new Button(120, 200, 340, 150, "PLAY AGAIN", 45, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
 		
-		unexploredNodes = new ArrayList<Node>();
-		trackableTiles = new ArrayList<Tile>();
-		//initializes the tiles
-		for(int i = 0; i < 31; i++ ) {
-			for(int j = 0; j < 28; j++) {
-				tiles[i][j] = new Tile(i, j, BOARD_TEMPLATE[i][j]);
-			}
-		}
+		screen = TITLE_SCREEN;
 		
-		//initializes the nodes
-		for(int i = 0; i < 31; i++) {
-			for(int j = 0; j < 28; j++) {
-				if(isNode(i,j))
-					nodes.add(new Node(tiles[i][j]));
-			}
-		}
-		
-		//initializes trackable tiles (for blue ghost, this algorithm can change)
-		for(int i = 0; i < 31; i++) {
-			for(int j = 0; j < 28; j++) {
-				if(getTile(i, j).getType() == Tile.PELLET || getTile(i, j).getType() == Tile.POWER_PELLET)
-					trackableTiles.add(getTile(i,j));
-			}
-		}
-		
-		
-		//connects the nodes
-		for(Node node : nodes) {
-			List<Node> neighbors = getNeighboringNodes(node.getTile());
-			Tile pTile = node.getTile();
-			for(Node neighbor : neighbors)
-				Node.connectNodes(node, neighbor, neighbors.indexOf(neighbor));
-		}
+		initializeBoard();
 	}
 	
 	//sets the width and height to 800
@@ -211,7 +180,7 @@ public class PacmanApplet extends PApplet {
 			ghostCollisions(orangeGhost);
 			ghostCollisions(pinkGhost);
 			
-			if(level != 0) {
+			if(freezeTime == 0) {
 				player.move(this);
 				player.draw(this);
 				
@@ -226,6 +195,19 @@ public class PacmanApplet extends PApplet {
 				orangeGhost.draw(this);
 				time++;
 				
+			} else {
+				freezeTime--;
+				pushStyle();
+				stroke(255);
+				textSize(30);
+				textAlign(CENTER, CENTER);
+				text("READY", 280, 335);
+				popStyle();
+			}
+			
+			if(!pelletsExist()) {
+				changeScreen(LEVEL_COMPLETE_SCREEN);
+				freezeTime = 120;
 			}
 			
 			
@@ -247,6 +229,29 @@ public class PacmanApplet extends PApplet {
 			popStyle();
 			
 			popMatrix();
+		} else if(screen == LEVEL_COMPLETE_SCREEN) {
+			pushMatrix();
+			scale((float) (width/560.0), (float) (height/800.0));
+			background(0);
+			
+			drawTiles();
+			
+			pushStyle();
+			textAlign(CENTER, CENTER);
+			textSize(25);
+			stroke(255);
+			text("Level " + level + "\nComplete", 280, 335);
+			popStyle();
+			
+			popMatrix();
+			
+			if(freezeTime == 0) {
+				level++;
+				initializeBoard();
+				resetPlayerAndGhosts();
+				changeScreen(GAME_SCREEN);
+			} else
+				freezeTime--;
 		}
 	}
 	
@@ -263,11 +268,13 @@ public class PacmanApplet extends PApplet {
 		if(screen == TITLE_SCREEN) {
 			if(startButton.getIsPressed()) {
 				startButton.act(-1, -1, false);
+				resetValues();
 				changeScreen(GAME_SCREEN);
 			}
 		} else if(screen == GAME_OVER_SCREEN) {
 			if(replayButton.getIsPressed()) {
 				replayButton.act(-1,  -1,  false);
+				resetValues();
 				changeScreen(GAME_SCREEN);
 			}
 		}
@@ -702,6 +709,16 @@ public class PacmanApplet extends PApplet {
 		
 	}
 	
+	private boolean pelletsExist() {
+		for(Tile[] row : tiles) {
+			for(Tile tile : row) {
+				if(tile.getType() == Tile.PELLET || tile.getType() == Tile.POWER_PELLET)
+					return true;
+			}
+		}
+		return false;
+	}
+	
 	private void reverseDirection(Ghost ghost) {
 		Tile above = getTile(ghost.getTileY() - 1, ghost.getTileX());
 		Tile below = getTile(ghost.getTileY() + 1, ghost.getTileX());
@@ -743,18 +760,64 @@ public class PacmanApplet extends PApplet {
 	}
 	
 	private void changeScreen(int newScreen) {
-		if(newScreen == GAME_SCREEN) {
-			time = 0;
-			level = 1;
-			ghostRunningTime = 0;
-			player = new Player(281, 520);
-			redGhost = new RedGhost(250, 280);
-			orangeGhost = new OrangeGhost(270, 280);
-			blueGhost = new BlueGhost(290, 280);
-			pinkGhost = new PinkGhost(310, 280);
-		}
-		
+		if(newScreen == GAME_SCREEN)
+			freezeTime = 60;
+		else
+			freezeTime = 0;
 		screen = newScreen;
+	}
+	
+	private void resetValues() {
+		time = 0;
+		level = 1;
+		resetPlayerAndGhosts();
+	}
+	
+	private void resetPlayerAndGhosts() {
+		ghostRunningTime = 0;
+		player = new Player(281, 520);
+		redGhost = new RedGhost(250, 280);
+		orangeGhost = new OrangeGhost(270, 280);
+		blueGhost = new BlueGhost(290, 280);
+		pinkGhost = new PinkGhost(310, 280);
+	}
+	
+	private void initializeBoard() {
+		nodes = new ArrayList<Node>();
+		
+		unexploredNodes = new ArrayList<Node>();
+		trackableTiles = new ArrayList<Tile>();
+		
+		// initializes the tiles
+		for (int i = 0; i < 31; i++) {
+			for (int j = 0; j < 28; j++) {
+				tiles[i][j] = new Tile(i, j, BOARD_TEMPLATE[i][j]);
+			}
+		}
+
+		// initializes the nodes
+		for (int i = 0; i < 31; i++) {
+			for (int j = 0; j < 28; j++) {
+				if (isNode(i, j))
+					nodes.add(new Node(tiles[i][j]));
+			}
+		}
+
+		// initializes trackable tiles (for blue ghost, this algorithm can change)
+		for (int i = 0; i < 31; i++) {
+			for (int j = 0; j < 28; j++) {
+				if (getTile(i, j).getType() == Tile.PELLET || getTile(i, j).getType() == Tile.POWER_PELLET)
+					trackableTiles.add(getTile(i, j));
+			}
+		}
+
+		// connects the nodes
+		for (Node node : nodes) {
+			List<Node> neighbors = getNeighboringNodes(node.getTile());
+			Tile pTile = node.getTile();
+			for (Node neighbor : neighbors)
+				Node.connectNodes(node, neighbor, neighbors.indexOf(neighbor));
+		}
 	}
 }
 
