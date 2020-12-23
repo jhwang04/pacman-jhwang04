@@ -614,7 +614,10 @@ public class PacmanApplet extends PApplet {
 		//System.out.println(path);
 		//System.out.println(start.getConnections() + "\n");
 		
-		drawPath(path, color);
+		
+		//UNCOMMENT TO SEE PATH
+		
+		//drawPath(path, color);
 		
 		//original pathfind ends here
 		
