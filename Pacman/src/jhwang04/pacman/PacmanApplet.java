@@ -874,5 +874,9 @@ public class PacmanApplet extends PApplet {
 	public void addPoints(int x) {
 		points += x;
 	}
+	
+	public int getTime() {
+		return time;
+	}
 }
 
