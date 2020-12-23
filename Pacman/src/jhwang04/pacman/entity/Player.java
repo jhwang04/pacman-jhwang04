@@ -9,7 +9,7 @@ public class Player extends Entity {
 	private int movementDirection;
 	
 	public Player(double x, double y) {
-		super(x, y, 200*0.75);
+		super(x, y, 200*0.6);
 		movementDirection = 0;
 	}
 	

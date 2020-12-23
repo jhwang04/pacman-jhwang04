@@ -21,9 +21,9 @@ public class Ghost extends Entity {
 	public static final int CHASE_MODE = 1;
 	public static final int RUN_MODE = 2;
 	public static final int RETURN_MODE = 3;
-	public static final double DEFAULT_GHOST_SPEED = 190*0.75;
-	public static final double RETURN_GHOST_SPEED = 400*0.75;
-	public static final double RUN_GHOST_SPEED = 160*0.75;
+	public static final double DEFAULT_GHOST_SPEED = 190*0.6;
+	public static final double RETURN_GHOST_SPEED = 400*0.6;
+	public static final double RUN_GHOST_SPEED = 160*0.6;
 	
 	public Ghost(double x, double y) {
 		this(x, y, new Color(200, 200, 200));

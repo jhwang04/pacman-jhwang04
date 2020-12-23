@@ -95,7 +95,7 @@ public class PacmanApplet extends PApplet {
 		pinkGhost = new PinkGhost(310, 280);
 		
 		startButton = new Button(120, 200, 340, 150, "START", 60, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
-		replayButton = new Button(120, 200, 340, 150, "PLAY AGAIN", 45, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
+		replayButton = new Button(120, 690, 320, 80, "PLAY AGAIN", 45, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
 		
 		screen = TITLE_SCREEN;
 		
@@ -222,7 +222,7 @@ public class PacmanApplet extends PApplet {
 			
 			popMatrix();
 		} else if(screen == GAME_OVER_SCREEN) {
-			pushMatrix();
+			/*pushMatrix();
 			scale((float) (width/560.0), (float) (height/800.0));
 			background(0);
 			
@@ -237,7 +237,26 @@ public class PacmanApplet extends PApplet {
 			
 			popStyle();
 			
+			popMatrix();*/
+			pushMatrix();
+			scale((float) (width/560.0), (float) (height/800.0));
+			background(0);
+			
+			drawTiles();
+			
+			pushStyle();
+			textAlign(CENTER, CENTER);
+			textSize(25);
+			fill(255, 0, 0);
+			text("GAME\nOVER", 280, 338);
+			
+			replayButton.act(mouseX, mouseY + 10, mousePressed);
+			replayButton.draw(this);
+			
+			popStyle();
+			
 			popMatrix();
+			
 		} else if(screen == LEVEL_COMPLETE_SCREEN) {
 			pushMatrix();
 			scale((float) (width/560.0), (float) (height/800.0));
@@ -283,6 +302,7 @@ public class PacmanApplet extends PApplet {
 		} else if(screen == GAME_OVER_SCREEN) {
 			if(replayButton.getIsPressed()) {
 				replayButton.act(-1,  -1,  false);
+				initializeBoard();
 				resetValues();
 				changeScreen(GAME_SCREEN);
 			}
