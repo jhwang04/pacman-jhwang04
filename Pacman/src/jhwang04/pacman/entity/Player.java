@@ -6,12 +6,10 @@ import jhwang04.pacman.PacmanApplet;
 import jhwang04.pacman.Tile;
 
 public class Player extends Entity {
-	private int score;
 	private int movementDirection;
 	
 	public Player(double x, double y) {
 		super(x, y, 200*0.75);
-		this.score = 0;
 		movementDirection = 0;
 	}
 	
@@ -110,8 +108,11 @@ public class Player extends Entity {
 		//eating the pellets
 		int tileType = p.getTile(getTileY(), getTileX()).getType();
 		if(tileType == Tile.PELLET || tileType == Tile.POWER_PELLET) {
-			if(tileType == Tile.POWER_PELLET)
+			if(tileType == Tile.POWER_PELLET) {
+				p.addPoints(50);
 				p.eatPowerPellet();
+			} else if(tileType == Tile.PELLET)
+				p.addPoints(10);
 			p.getTile(getTileY(), getTileX()).setType(Tile.AIR);
 		}
 			

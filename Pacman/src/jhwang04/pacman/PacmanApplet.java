@@ -17,6 +17,7 @@ import processing.core.PApplet;
 public class PacmanApplet extends PApplet {
 	private int level;
 	private int screen;
+	private int points, ghostsEaten, newPoints;
 	private Tile[][] tiles = new Tile[31][28];
 	private Player player;
 	private RedGhost redGhost;
@@ -83,6 +84,8 @@ public class PacmanApplet extends PApplet {
 	public PacmanApplet() {
 		time = 0;
 		freezeTime = 0;
+		points = 0;
+		ghostsEaten = 0;
 		level = 1;
 		ghostRunningTime = 0;
 		player = new Player(281, 520);
@@ -166,9 +169,11 @@ public class PacmanApplet extends PApplet {
 			
 			pushStyle();
 			stroke(255);
-			textSize(20);
+			textSize(25);
 			textAlign(LEFT, CENTER);
-			text("Time = " + Math.round((time/60 + (time%60)/60.0) * 1000.0)/1000.0, 30, 25);
+			text("Time = " + Math.round((time/60 + (time%60)/60.0) * 1000.0)/1000.0, 10, 780);
+			text(points + " points", 25, 30);
+			text("Level " + level, 240, 30);
 			popStyle();
 			
 			drawTiles();
@@ -201,7 +206,11 @@ public class PacmanApplet extends PApplet {
 				stroke(255);
 				textSize(30);
 				textAlign(CENTER, CENTER);
-				text("READY", 280, 335);
+				if(redGhost.getMode() == Ghost.RETURN_MODE || blueGhost.getMode() == Ghost.RETURN_MODE || pinkGhost.getMode() == Ghost.RETURN_MODE || orangeGhost.getMode() == Ghost.RETURN_MODE) {
+					text("" + newPoints, (float) player.getX(), (float) player.getY());
+				} else {
+					text("READY", 280, 335);
+				}
 				popStyle();
 			}
 			
@@ -698,6 +707,7 @@ public class PacmanApplet extends PApplet {
 	
 	public void eatPowerPellet() {
 		ghostRunningTime = 600;
+		ghostsEaten = 0;
 		reverseDirection(redGhost);
 		reverseDirection(blueGhost);
 		reverseDirection(pinkGhost);
@@ -745,8 +755,28 @@ public class PacmanApplet extends PApplet {
 		if(player.isTouching(ghost)) {
 			if(ghost.getMode() == Ghost.CHASE_MODE)
 				changeScreen(GAME_OVER_SCREEN);
-			else if(ghost.getMode() == Ghost.RUN_MODE)
+			else if(ghost.getMode() == Ghost.RUN_MODE) {
 				ghost.setMode(Ghost.RETURN_MODE);
+				if(ghostsEaten == 0)
+					newPoints = 200;
+				else if(ghostsEaten == 1)
+					newPoints = 400;
+				else if(ghostsEaten == 2)
+					newPoints = 800;
+				else if(ghostsEaten == 3)
+					newPoints = 1600;
+				else
+					newPoints = -1;
+				addPoints(newPoints);
+				freezeTime = 30;
+				ghostsEaten++;
+				/*pushStyle();
+				fill(255);
+				textAlign(CENTER, CENTER);
+				textSize(20);
+				text("" + newPoints, (float) player.getX(), (float) player.getY());
+				popStyle();*/
+			}
 		}
 	}
 	
@@ -770,6 +800,7 @@ public class PacmanApplet extends PApplet {
 	private void resetValues() {
 		time = 0;
 		level = 1;
+		points = 0;
 		resetPlayerAndGhosts();
 	}
 	
@@ -818,6 +849,10 @@ public class PacmanApplet extends PApplet {
 			for (Node neighbor : neighbors)
 				Node.connectNodes(node, neighbor, neighbors.indexOf(neighbor));
 		}
+	}
+	
+	public void addPoints(int x) {
+		points += x;
 	}
 }
 
