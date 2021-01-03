@@ -120,6 +120,22 @@ public class Ghost extends Entity {
 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 	};
+	private static final int[][] GHOST_EYES_RUN = new int[][] {
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0},
+		{0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0},
+		{0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	};
 	
 	public Ghost(double x, double y) {
 		this(x, y, new Color(200, 200, 200));
@@ -155,6 +171,7 @@ public class Ghost extends Entity {
 		p.ellipse(0, 0, 30, 30);*/
 
 		//p.noStroke();
+		boolean isGhostFlashingWhite = false;
 		if(mode == CHASE_MODE) {
 			p.fill(pathColor.getRed(), pathColor.getGreen(), pathColor.getBlue());
 			p.stroke(pathColor.getRed(), pathColor.getGreen(), pathColor.getBlue());
@@ -162,6 +179,7 @@ public class Ghost extends Entity {
 			if(p.getGhostRunningTime() % 50 < 25 && p.getGhostRunningTime() < 300) {
 				p.fill(255, 255, 255);
 				p.stroke(255, 255, 255);
+				isGhostFlashingWhite = true;
 			}
 			else {
 				p.fill(0, 0, 255);
@@ -170,6 +188,7 @@ public class Ghost extends Entity {
 			}
 		} else if(mode == RETURN_MODE) {
 			p.noFill();
+			p.noStroke();
 		}
 		
 		
@@ -200,15 +219,25 @@ public class Ghost extends Entity {
 			eyePattern = GHOST_EYES_RIGHT;
 		else
 			eyePattern = GHOST_EYES_LEFT;
+		
+		if(mode == RUN_MODE)
+			eyePattern = GHOST_EYES_RUN;
+		
 		for(int i = -7; i < 7; i++) {
 			for(int j = -7; j < 7; j++) {
 				int offsetX = j * 2;
 				int offsetY = i * 2;
 				
 				if(eyePattern[i+7][j+7] == 1) {
-					p.fill(255);
-					p.stroke(255);
+					if(!isGhostFlashingWhite) {
+						p.fill(255);
+						p.stroke(255);
+					} else {
+						p.fill(0, 0, 255);
+						p.stroke(0, 0, 255);
+					}
 					p.rect(offsetX, offsetY, 2, 2);
+					
 				} else if(eyePattern[i+7][j+7] == 2) {
 					p.fill(0, 0, 255);
 					p.stroke(0, 0, 255);
