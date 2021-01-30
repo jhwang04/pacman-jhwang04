@@ -2,6 +2,7 @@ package jhwang04.pacman;
 
 
 import java.awt.Color;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -103,7 +104,7 @@ public class PacmanApplet extends PApplet {
 		replayButton = new Button(15, 690, 255, 94, "REPLAY", 40, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
 		mainMenuButton = new Button(290, 690, 255, 94, "MENU", 45, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
 		backButton = new Button(120, 690, 320, 80, "BACK", 45, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
-		showGhostPathButton = new Button(120, 690, 320, 80, "PLAY AGAIN", 45, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
+		showGhostPathButton = new Button(390, 170, 150, 70, "FALSE", 35, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
 		
 		screen = TITLE_SCREEN;
 		
@@ -142,22 +143,22 @@ public class PacmanApplet extends PApplet {
 			background(0);
 			
 			if(keyPressed) {
-				if(keyCode == UP) {
+				if(keyCode == KeyEvent.VK_UP) {
 					if(player.getUp() == false)
 						player.setDown(false);
 					player.setUp(true);
 				}
-				if(keyCode == DOWN) {
+				if(keyCode == KeyEvent.VK_DOWN) {
 					if(player.getDown() == false)
 						player.setUp(false);
 					player.setDown(true);
 				}
-				if(keyCode == RIGHT) {
+				if(keyCode == KeyEvent.VK_RIGHT) {
 					if(player.getRight() == false)
 						player.setLeft(false);
 					player.setRight(true);
 				}
-				if(keyCode == LEFT) {
+				if(keyCode == KeyEvent.VK_LEFT) {
 					if(player.getLeft() == false)
 						player.setRight(false);
 					player.setLeft(true);
@@ -260,6 +261,14 @@ public class PacmanApplet extends PApplet {
 			fill(255, 0, 0);
 			text("GAME\nOVER", 280, 338);
 			
+			pushStyle();
+			fill(255);
+			textSize(25);
+			textAlign(LEFT, CENTER);
+			text(points + " points", 25, 30);
+			text("Level " + level, 240, 30);
+			popStyle();
+			
 			replayButton.act(mouseX, mouseY + 10, mousePressed);
 			replayButton.draw(this);
 			mainMenuButton.act(mouseX, mouseY + 10, mousePressed);
@@ -303,6 +312,10 @@ public class PacmanApplet extends PApplet {
 			stroke(255);
 			text("OPTIONS", 280, 100);
 			
+			textSize(35);
+			textAlign(LEFT, CENTER);
+			text("SHOW GHOST PATH: ", 30, 200);
+			
 			showGhostPathButton.act(mouseX, mouseY + 10, mousePressed);
 			showGhostPathButton.draw(this);
 			backButton.act(mouseX, mouseY + 10, mousePressed);
@@ -338,6 +351,9 @@ public class PacmanApplet extends PApplet {
 			if(backButton.getIsPressed()) {
 				backButton.act(-1, -1, false);
 				changeScreen(TITLE_SCREEN);
+			} else if(showGhostPathButton.getIsPressed()) {
+				showGhostPath = !showGhostPath;
+				showGhostPathButton.setText(("" + showGhostPath).toUpperCase());
 			}
 		} else if(screen == GAME_OVER_SCREEN) {
 			if(replayButton.getIsPressed()) {
@@ -660,7 +676,8 @@ public class PacmanApplet extends PApplet {
 		
 		//UNCOMMENT TO SEE PATH
 		
-		//drawPath(path, color);
+		if(showGhostPath)
+			drawPath(path, color);
 		
 		//original pathfind ends here
 		
@@ -923,6 +940,10 @@ public class PacmanApplet extends PApplet {
 	
 	public int getTime() {
 		return time;
+	}
+	
+	public boolean getShowGhostPath() {
+		return showGhostPath;
 	}
 }
 

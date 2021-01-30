@@ -47,7 +47,10 @@ public class Button {
 			p.textSize(textSize);
 			p.popMatrix();
 			p.fill(textColor.getRed(), textColor.getGreen(), textColor.getBlue());
-			p.text(text, x + width/2, y + height/2 -10/*+ textSize*3/4*/);
+			if(textSize > 40)
+				p.text(text, x + width/2, y + height/2 -10/*+ textSize*3/4*/);
+			else
+				p.text(text, x + width/2, y + height/2 -6/*+ textSize*3/4*/);
 		} else {
 			p.translate(x, y);
 			p.rect(0, 0, width, height, 10);
@@ -55,7 +58,10 @@ public class Button {
 			p.textSize(textSize);
 			p.popMatrix();
 			p.fill(textColor.getRed(), textColor.getGreen(), textColor.getBlue());
-			p.text(text, x + width/2, y + height/2 -10/*+ textSize/4*/);
+			if(textSize > 40)
+				p.text(text, x + width/2, y + height/2 -10/*+ textSize*3/4*/);
+			else
+				p.text(text, x + width/2, y + height/2 -6/*+ textSize*3/4*/);
 		}
 		
 		
@@ -114,5 +120,13 @@ public class Button {
 	
 	public boolean getIsPressed() {
 		return isPressed;
+	}
+	
+	public String getText() {
+		return text;
+	}
+	
+	public void setText(String text) {
+		this.text = text;
 	}
 }

@@ -249,19 +249,21 @@ public class Ghost extends Entity {
 		p.popMatrix();
 		
 		//drawing the X at the target
-		/*p.pushMatrix();
-		
-		p.translate((float) targetTile.getColumn()*20 + 10, targetTile.getRow()*20 + 60);
-		p.strokeWeight(3);
-		p.stroke(pathColor.getRed(), pathColor.getGreen(), pathColor.getBlue());
-		
-		if(mode == CHASE_MODE) {
-			p.line(-8, -8, 8, 8);
-			p.line(8, -8, -8, 8);
+		if(p.getShowGhostPath()) {
+			p.pushMatrix();
+			p.translate((float) targetTile.getColumn()*20 + 10, targetTile.getRow()*20 + 60);
+			p.strokeWeight(3);
+			p.stroke(pathColor.getRed(), pathColor.getGreen(), pathColor.getBlue());
+			
+			if(mode == CHASE_MODE) {
+				p.line(-8, -8, 8, 8);
+				p.line(8, -8, -8, 8);
+			}
+			
+			
+			p.popMatrix();
 		}
 		
-		
-		p.popMatrix();*/
 		p.popStyle();
 	}
 	
