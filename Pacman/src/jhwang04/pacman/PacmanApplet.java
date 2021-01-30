@@ -25,8 +25,8 @@ public class PacmanApplet extends PApplet {
 	private PinkGhost pinkGhost;
 	private BlueGhost blueGhost;
 	private int time, freezeTime;
-	private Button startButton, replayButton, optionsButton;
-	private Button showGhostPathButton;
+	private Button startButton, replayButton, optionsButton, mainMenuButton;
+	private Button showGhostPathButton, backButton;
 	private boolean showGhostPath;
 	
 	private int ghostRunningTime;
@@ -96,10 +96,13 @@ public class PacmanApplet extends PApplet {
 		orangeGhost = new OrangeGhost(270, 280);
 		blueGhost = new BlueGhost(290, 280);
 		pinkGhost = new PinkGhost(310, 280);
+		showGhostPath = false;
 		
 		startButton = new Button(120, 200, 340, 150, "START", 60, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
 		optionsButton = new Button(120, 400, 340, 150, "OPTIONS", 60, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
-		replayButton = new Button(120, 690, 320, 80, "PLAY AGAIN", 45, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
+		replayButton = new Button(15, 690, 255, 94, "REPLAY", 40, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
+		mainMenuButton = new Button(290, 690, 255, 94, "MENU", 45, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
+		backButton = new Button(120, 690, 320, 80, "BACK", 45, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
 		showGhostPathButton = new Button(120, 690, 320, 80, "PLAY AGAIN", 45, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
 		
 		screen = TITLE_SCREEN;
@@ -259,6 +262,8 @@ public class PacmanApplet extends PApplet {
 			
 			replayButton.act(mouseX, mouseY + 10, mousePressed);
 			replayButton.draw(this);
+			mainMenuButton.act(mouseX, mouseY + 10, mousePressed);
+			mainMenuButton.draw(this);
 			
 			popStyle();
 			
@@ -300,6 +305,8 @@ public class PacmanApplet extends PApplet {
 			
 			showGhostPathButton.act(mouseX, mouseY + 10, mousePressed);
 			showGhostPathButton.draw(this);
+			backButton.act(mouseX, mouseY + 10, mousePressed);
+			backButton.draw(this);
 			
 			popStyle();
 			
@@ -320,11 +327,17 @@ public class PacmanApplet extends PApplet {
 		if(screen == TITLE_SCREEN) {
 			if(startButton.getIsPressed()) {
 				startButton.act(-1, -1, false);
+				initializeBoard();
 				resetValues();
 				changeScreen(GAME_SCREEN);
 			} else if(optionsButton.getIsPressed()) {
 				optionsButton.act(-1, -1, false);
 				changeScreen(OPTIONS_SCREEN);
+			}
+		} else if(screen == OPTIONS_SCREEN) {
+			if(backButton.getIsPressed()) {
+				backButton.act(-1, -1, false);
+				changeScreen(TITLE_SCREEN);
 			}
 		} else if(screen == GAME_OVER_SCREEN) {
 			if(replayButton.getIsPressed()) {
@@ -332,6 +345,9 @@ public class PacmanApplet extends PApplet {
 				initializeBoard();
 				resetValues();
 				changeScreen(GAME_SCREEN);
+			} else if(mainMenuButton.getIsPressed()) {
+				mainMenuButton.act(-1, -1, false);;
+				changeScreen(TITLE_SCREEN);
 			}
 		}
 	}
