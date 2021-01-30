@@ -25,7 +25,9 @@ public class PacmanApplet extends PApplet {
 	private PinkGhost pinkGhost;
 	private BlueGhost blueGhost;
 	private int time, freezeTime;
-	private Button startButton, replayButton;
+	private Button startButton, replayButton, optionsButton;
+	private Button showGhostPathButton;
+	private boolean showGhostPath;
 	
 	private int ghostRunningTime;
 	
@@ -38,6 +40,7 @@ public class PacmanApplet extends PApplet {
 	public static final int GAME_OVER_SCREEN = 2;
 	public static final int HELP_SCREEN = 3;
 	public static final int LEVEL_COMPLETE_SCREEN = 4;
+	public static final int OPTIONS_SCREEN = 5;
 	public static final int[][] BOARD_TEMPLATE = new int[][] {
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 		{1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1},
@@ -95,7 +98,9 @@ public class PacmanApplet extends PApplet {
 		pinkGhost = new PinkGhost(310, 280);
 		
 		startButton = new Button(120, 200, 340, 150, "START", 60, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
+		optionsButton = new Button(120, 400, 340, 150, "OPTIONS", 60, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
 		replayButton = new Button(120, 690, 320, 80, "PLAY AGAIN", 45, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
+		showGhostPathButton = new Button(120, 690, 320, 80, "PLAY AGAIN", 45, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
 		
 		screen = TITLE_SCREEN;
 		
@@ -121,6 +126,8 @@ public class PacmanApplet extends PApplet {
 			
 			startButton.act(mouseX, mouseY + 10, mousePressed);
 			startButton.draw(this);
+			optionsButton.act(mouseX, mouseY + 10, mousePressed);
+			optionsButton.draw(this);
 			
 			popStyle();
 			
@@ -280,6 +287,23 @@ public class PacmanApplet extends PApplet {
 				changeScreen(GAME_SCREEN);
 			} else
 				freezeTime--;
+		} else if(screen == OPTIONS_SCREEN) {
+			pushMatrix();
+			scale((float) (width/560.0), (float) (height/800.0));
+			background(0);
+			
+			pushStyle();
+			textAlign(CENTER, CENTER);
+			textSize(80);
+			stroke(255);
+			text("OPTIONS", 280, 100);
+			
+			showGhostPathButton.act(mouseX, mouseY + 10, mousePressed);
+			showGhostPathButton.draw(this);
+			
+			popStyle();
+			
+			popMatrix();
 		}
 	}
 	
@@ -298,6 +322,9 @@ public class PacmanApplet extends PApplet {
 				startButton.act(-1, -1, false);
 				resetValues();
 				changeScreen(GAME_SCREEN);
+			} else if(optionsButton.getIsPressed()) {
+				optionsButton.act(-1, -1, false);
+				changeScreen(OPTIONS_SCREEN);
 			}
 		} else if(screen == GAME_OVER_SCREEN) {
 			if(replayButton.getIsPressed()) {

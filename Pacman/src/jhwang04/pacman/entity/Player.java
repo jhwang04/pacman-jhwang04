@@ -7,19 +7,23 @@ import jhwang04.pacman.Tile;
 
 public class Player extends Entity {
 	private int movementDirection;
+	private int animationStage;
 	
 	public Player(double x, double y) {
 		super(x, y, 200*0.6);
 		movementDirection = 0;
+		animationStage = 0;
 	}
 	
 	public void draw(PacmanApplet p) {
 		int time = p.getTime();
 		int openness = 0;
-		if(time%12 < 6)
-			openness = 25 * (time%12);
+		if(animationStage < 6)
+			openness = 25 * (animationStage);
 		else
-			openness = 25 * (12 - (time%12));
+			openness = 25 * (12 - animationStage);
+		
+		//animationStage = (animationStage + 1)%12;
 		
 			
 		/*p.pushStyle();
@@ -93,21 +97,25 @@ public class Player extends Entity {
 			setY(getY() - getSpeed()/60.0);
 			movementDirection = 0;
 			setXInTile(10.0);
+			animationStage = (animationStage + 1)%12;
 		}
 		if(getDown() == true) {
 			setY(getY() + getSpeed()/60.0);
 			movementDirection = 2;
 			setXInTile(10.0);
+			animationStage = (animationStage + 1)%12;
 		}
 		if(getRight() == true) {
 			setX(getX() + getSpeed()/60.0);
 			movementDirection = 1;
 			setYInTile(10.0);
+			animationStage = (animationStage + 1)%12;
 		}
 		if(getLeft() == true) {
 			setX(getX() - getSpeed()/60.0);
 			movementDirection = 3;
 			setYInTile(10.0);
+			animationStage = (animationStage + 1)%12;
 		}
 		
 		//looping mechanic
