@@ -14,14 +14,29 @@ public class Player extends Entity {
 	}
 	
 	public void draw(PacmanApplet p) {
+		int time = p.getTime();
+		int openness = 0;
+		if(time%12 < 6)
+			openness = 25 * (time%12);
+		else
+			openness = 25 * (12 - (time%12));
 		
-		p.pushStyle();
+			
+		/*p.pushStyle();
 		p.pushMatrix();
 		p.translate((float) getX(), (float) getY());
 		p.fill(255, 255, 0);
 		p.ellipse(0, 0, 30, 30);
 		p.popStyle();
+		p.popMatrix();*/
+		p.pushStyle();
+		p.pushMatrix();
+		p.translate((float) getX(), (float) getY());
+		p.fill(255, 255, 0);
+		p.rotate((float) ((movementDirection-1) / 4.0 * Math.PI * 2));
+		p.arc(0, 0, 30, 30, (float) ((openness/2)*Math.PI/180), (float) (Math.PI * 2 - (openness/2 * Math.PI / 180)));
 		p.popMatrix();
+		p.popStyle();
 	}
 	
 	public void move(PacmanApplet p) {
