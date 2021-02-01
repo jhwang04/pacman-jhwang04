@@ -27,8 +27,11 @@ public class PacmanApplet extends PApplet {
 	private BlueGhost blueGhost;
 	private int time, freezeTime;
 	private Button startButton, replayButton, optionsButton, mainMenuButton;
+	private Button setUpKey, setDownKey, setLeftKey, setRightKey;
 	private Button showGhostPathButton, backButton;
 	private boolean showGhostPath;
+	private int upCode, downCode, leftCode, rightCode;
+	private Button selectedKeyButton;
 	
 	private int ghostRunningTime;
 	
@@ -99,12 +102,24 @@ public class PacmanApplet extends PApplet {
 		pinkGhost = new PinkGhost(310, 280);
 		showGhostPath = false;
 		
+		upCode = KeyEvent.VK_UP;
+		downCode = KeyEvent.VK_DOWN;
+		leftCode = KeyEvent.VK_LEFT;
+		rightCode = KeyEvent.VK_RIGHT;
+		
 		startButton = new Button(120, 200, 340, 150, "START", 60, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
 		optionsButton = new Button(120, 400, 340, 150, "OPTIONS", 60, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
 		replayButton = new Button(15, 690, 255, 94, "REPLAY", 40, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
 		mainMenuButton = new Button(290, 690, 255, 94, "MENU", 45, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
 		backButton = new Button(120, 690, 320, 80, "BACK", 45, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
+		
+		//option buttons
 		showGhostPathButton = new Button(390, 170, 150, 70, "FALSE", 35, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
+		setUpKey = new Button(390, 250, 150, 70, "", 35, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
+		setDownKey = new Button(390, 330, 150, 70, "", 35, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
+		setLeftKey = new Button(390, 410, 150, 70, "", 35, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
+		setRightKey = new Button(390, 490, 150, 70, "", 35, Color.BLUE, Color.RED, Color.WHITE, Color.WHITE);
+		setKeyCodeText();
 		
 		screen = TITLE_SCREEN;
 		
@@ -143,22 +158,29 @@ public class PacmanApplet extends PApplet {
 			background(0);
 			
 			if(keyPressed) {
-				if(keyCode == KeyEvent.VK_UP) {
+				//System.out.println("up, right, down, left codes = " + upCode + ", " + rightCode + ", " + downCode + ", " + leftCode);
+				int newKeyCode;
+				if(keyCode != 0)
+					newKeyCode = keyCode;
+				else
+					newKeyCode = KeyEvent.getExtendedKeyCodeForChar(key);
+				
+				if(newKeyCode == upCode) {
 					if(player.getUp() == false)
 						player.setDown(false);
 					player.setUp(true);
 				}
-				if(keyCode == KeyEvent.VK_DOWN) {
+				if(newKeyCode == downCode) {
 					if(player.getDown() == false)
 						player.setUp(false);
 					player.setDown(true);
 				}
-				if(keyCode == KeyEvent.VK_RIGHT) {
+				if(newKeyCode == rightCode) {
 					if(player.getRight() == false)
 						player.setLeft(false);
 					player.setRight(true);
 				}
-				if(keyCode == KeyEvent.VK_LEFT) {
+				if(newKeyCode == leftCode) {
 					if(player.getLeft() == false)
 						player.setRight(false);
 					player.setLeft(true);
@@ -315,13 +337,65 @@ public class PacmanApplet extends PApplet {
 			textSize(35);
 			textAlign(LEFT, CENTER);
 			text("SHOW GHOST PATH: ", 30, 200);
+			text("UP KEY: ", 30, 280);
+			text("DOWN KEY: ", 30, 360);
+			text("LEFT KEY: ", 30, 440);
+			text("RIGHT KEY: ", 30, 520);
 			
 			showGhostPathButton.act(mouseX, mouseY + 10, mousePressed);
 			showGhostPathButton.draw(this);
 			backButton.act(mouseX, mouseY + 10, mousePressed);
 			backButton.draw(this);
+
+			setUpKey.act(mouseX, mouseY + 10, mousePressed);
+			setUpKey.draw(this);
+			setDownKey.act(mouseX, mouseY + 10, mousePressed);
+			setDownKey.draw(this);
+			setLeftKey.act(mouseX, mouseY + 10, mousePressed);
+			setLeftKey.draw(this);
+			setRightKey.act(mouseX, mouseY + 10, mousePressed);
+			setRightKey.draw(this);
 			
 			popStyle();
+			
+			if(keyPressed) {
+				int newKeyCode = -1;
+				//System.out.println(keyCode + ", " + key);
+				/*if(keyCode == CODED)
+					newIndex = keyCode;
+				else if((key >= 'A' && key <= 'Z') || (key >= 'a' && key <= 'z')) {
+					if(key <= 'Z') {
+						newIndex = key-'A';
+					} else
+						newIndex = key-'a';
+				}
+				else
+					newIndex = (int) key;*/
+				if(keyCode != 0)
+					newKeyCode = keyCode;
+				else
+					newKeyCode = KeyEvent.getExtendedKeyCodeForChar(key);
+				
+				//System.out.println(newKeyCode);
+				
+				if(newKeyCode != KeyEvent.VK_UNDEFINED) {
+					if(selectedKeyButton == null && newKeyCode != upCode && newKeyCode != downCode && newKeyCode != leftCode && newKeyCode != rightCode) {
+						//do nothing, but fail fast
+					} else if(selectedKeyButton == setUpKey) {
+						upCode = newKeyCode;
+					} else if(selectedKeyButton == setDownKey) {
+						downCode = newKeyCode;
+					} else if(selectedKeyButton == setLeftKey) {
+						leftCode = newKeyCode;
+					} else if(selectedKeyButton == setRightKey) {
+						rightCode = newKeyCode;
+					}
+				}
+
+				selectedKeyButton = null;
+				setKeyCodeText();
+				
+			}
 			
 			popMatrix();
 		}
@@ -354,7 +428,16 @@ public class PacmanApplet extends PApplet {
 			} else if(showGhostPathButton.getIsPressed()) {
 				showGhostPath = !showGhostPath;
 				showGhostPathButton.setText(("" + showGhostPath).toUpperCase());
+			} else if(setUpKey.getIsPressed()) {
+				selectedKeyButton = setUpKey;
+			} else if(setDownKey.getIsPressed()) {
+				selectedKeyButton = setDownKey;
+			} else if(setLeftKey.getIsPressed()) {
+				selectedKeyButton = setLeftKey;
+			} else if(setRightKey.getIsPressed()) {
+				selectedKeyButton = setRightKey;
 			}
+			setKeyCodeText();
 		} else if(screen == GAME_OVER_SCREEN) {
 			if(replayButton.getIsPressed()) {
 				replayButton.act(-1,  -1,  false);
@@ -875,6 +958,8 @@ public class PacmanApplet extends PApplet {
 	private void changeScreen(int newScreen) {
 		if(newScreen == GAME_SCREEN)
 			freezeTime = 60;
+		else if(newScreen == OPTIONS_SCREEN)
+			setKeyCodeText();
 		else
 			freezeTime = 0;
 		screen = newScreen;
@@ -944,6 +1029,19 @@ public class PacmanApplet extends PApplet {
 	
 	public boolean getShowGhostPath() {
 		return showGhostPath;
+	}
+	
+	private void setKeyCodeText() {
+		setUpKey.setText(KeyEvent.getKeyText(upCode).toUpperCase());
+		setDownKey.setText(KeyEvent.getKeyText(downCode).toUpperCase());
+		setLeftKey.setText(KeyEvent.getKeyText(leftCode).toUpperCase());
+		setRightKey.setText(KeyEvent.getKeyText(rightCode).toUpperCase());
+		/*setUpKey.setText((char) upCode + "");
+		setDownKey.setText((char) downCode + "");
+		setLeftKey.setText((char) leftCode + "");
+		setRightKey.setText((char) rightCode + "");*/
+		if(selectedKeyButton != null)
+			selectedKeyButton.setText(">" + selectedKeyButton.getText() + "<");
 	}
 }
 
