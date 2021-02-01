@@ -379,7 +379,7 @@ public class PacmanApplet extends PApplet {
 				//System.out.println(newKeyCode);
 				
 				if(newKeyCode != KeyEvent.VK_UNDEFINED) {
-					if(selectedKeyButton == null && newKeyCode != upCode && newKeyCode != downCode && newKeyCode != leftCode && newKeyCode != rightCode) {
+					if(selectedKeyButton == null || newKeyCode == upCode || newKeyCode == downCode || newKeyCode == leftCode || newKeyCode == rightCode) {
 						//do nothing, but fail fast
 					} else if(selectedKeyButton == setUpKey) {
 						upCode = newKeyCode;
