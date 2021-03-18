@@ -9,6 +9,8 @@ fileName=pacman-jhwang04.jar
 #cd dist
 cd bin
 
+ls
+
 mkdir -p libs
 cp ../lib/processing_core.jar ./libs/processing_core.jar
 cd libs
